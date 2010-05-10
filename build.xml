@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ Copyright (c) 2010 Concurrent, Inc. All Rights Reserved.
+  ~
+  ~ Project and contact information: http://www.concurrentinc.com/
+  -->
+
+<project name="load" default="build" basedir=".">
+
+  <!-- load properties first -->
+  <property file="../build.properties"/>
+  <property file="./build.properties"/>
+
+  <!-- these are optional, only used if you uncomment the project.class.path filesets below -->
+  <property name="hadoop.home" location="${basedir}/../hadoop"/>
+  <property name="hadoop.lib" location="${hadoop.home}/lib"/>
+
+  <!-- assumes Cascading shares the same parent directory, change if necessary -->
+  <property name="cascading.home" location="${basedir}/../cascading"/>
+  <property name="cascading.libs" value="${cascading.home}/lib"/>
+  <property name="cascading.libs.core" value="${cascading.libs}"/>
+  <property name="cascading.libs.xml" value="${cascading.libs}/xml"/>
+
+  <condition property="cascading.path" value="${cascading.home}/build"
+             else="${cascading.home}">
+    <available file="${cascading.home}/build"/>
+  </condition>
+
+  <property file="${cascading.home}/version.properties"/>
+
+  <property name="src.dir" location="${basedir}/src/java"/>
+  <property name="src.data" location="${basedir}/src/data"/>
+  <property name="src.test" location="${basedir}/src/test"/>
+
+  <available file="${src.dir}" type="dir" property="main.available"/>
+  <available file="${src.test}" type="dir" property="test.available"/>
+
+  <property name="conf.dir" location="${hadoop.home}/conf"/>
+
+  <property name="lib.dir" location="${basedir}/lib"/>
+
+  <property name="build.dir" location="${basedir}/build/"/>
+  <property name="build.classes" location="${build.dir}/classes"/>
+  <property name="build.test" location="${build.dir}/test"/>
+
+  <property name="test.results" location="${build.dir}/testresults"/>
+  <property name="test.showoutput" value="no"/>
+
+  <property name="dist" location="dist"/>
+
+  <path id="project.class.path">
+    <pathelement location="${build.classes}"/>
+    <pathelement location="${build.test}"/>
+
+    <fileset dir="${cascading.path}">
+      <include name="cascading-core-*.jar"/>
+      <include name="cascading-xml-*.jar"/>
+      <include name="cascading-test-*.jar"/>
+    </fileset>
+
+    <fileset dir="${cascading.libs.core}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${cascading.libs.xml}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <pathelement location="${hadoop.home}"/>
+
+    <fileset dir="${hadoop.lib}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${hadoop.home}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${hadoop.home}/build" erroronmissingdir="false">
+      <include name="*.jar"/>
+    </fileset>
+
+  </path>
+
+  <target name="clean">
+
+    <echo message="cleaning..."/>
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist}"/>
+    <delete dir="${ant.project.name}.tgz"/>
+
+  </target>
+
+  <target name="compile">
+
+    <echo message="building..."/>
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${lib.dir}"/>
+
+    <javac srcdir="${src.dir}" destdir="${build.classes}" verbose="off" debug="true" includeantruntime="false">
+      <classpath refid="project.class.path"/>
+    </javac>
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.data}">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <target name="compile-test">
+
+    <echo message="building..."/>
+    <mkdir dir="${build.test}"/>
+    <mkdir dir="${lib.dir}"/>
+
+    <javac srcdir="${src.test}" destdir="${build.test}" verbose="off">
+      <classpath refid="project.class.path"/>
+    </javac>
+
+    <copy todir="${build.test}">
+      <fileset dir="${src.test}">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <!-- runs JUnit tests -->
+  <target name="test" depends="compile,compile-test" description="run the unit tests">
+    <echo message="running all tests..."/>
+
+    <mkdir dir="build/test/log"/>
+    <mkdir dir="${test.results}"/>
+
+    <junit printsummary="true" showoutput="${test.showoutput}" fork="yes" haltonerror="no" haltonfailure="no" dir="."
+           maxmemory="756m">
+
+      <sysproperty key="test.cluster.enabled" value="${test.cluster.enabled}"/>
+      <sysproperty key="test.build.data" value="${log.data}"/>
+      <sysproperty key="hadoop.log.dir" value="build/test/log"/>
+
+      <!--<jvmarg value="-Xdebug"/>--><!--<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"/>-->
+
+      <classpath>
+        <path refid="project.class.path"/>
+        <pathelement path="${java.class.path}"/>
+      </classpath>
+      <formatter type="plain" usefile="true"/>
+
+      <test name="${testcase}" todir="${test.results}" if="testcase" haltonfailure="${test.haltonerror}"/>
+      <batchtest todir="${test.results}" haltonfailure="${test.haltonerror}" unless="testcase">
+        <fileset dir="${src.test}">
+          <include name="**/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+  </target>
+
+  <tstamp/>
+
+  <target name="stamp-jar" depends="jar">
+    <move file="${build.dir}/${ant.project.name}.jar"
+          tofile="${build.dir}/${ant.project.name}-${DSTAMP}.jar"/>
+  </target>
+
+  <target name="jar" depends="compile" description="creates a Hadoop ready jar will all dependencies">
+
+    <!-- copy Cascading classes and libraries -->
+    <copy todir="${build.classes}/lib">
+      <fileset dir="${cascading.path}">
+        <include name="cascading-core-*.jar"/>
+        <include name="cascading-xml-*.jar"/>
+      </fileset>
+      <fileset dir="${cascading.libs.core}" includes="*.jar"/>
+      <fileset dir="${cascading.libs.xml}" includes="*.jar"/>
+    </copy>
+
+    <jar jarfile="${build.dir}/${ant.project.name}.jar">
+      <fileset dir="${build.classes}"/>
+      <fileset dir="${basedir}" includes="lib/"/>
+      <manifest>
+        <attribute name="Main-Class" value="${ant.project.name}/Main"/>
+      </manifest>
+    </jar>
+
+  </target>
+
+  <target name="dist" depends="clean,jar,stamp-jar" description="packages current project">
+
+    <mkdir dir="${dist}"/>
+
+    <copy todir="${dist}">
+
+      <fileset dir=".">
+        <include name="data/**"/>
+        <include name="src/**"/>
+        <!--<include name="lib/**"/>-->
+        <include name="build.xml"/>
+        <include name="README.TXT"/>
+      </fileset>
+
+      <fileset dir="${build.dir}">
+        <include name="*.jar"/>
+      </fileset>
+
+    </copy>
+
+  </target>
+
+  <target name="tar" depends="dist" description="creates an archive of current project">
+    <tar destfile="${ant.project.name}-${DSTAMP}.tgz"
+         compression="gzip">
+      <tarfileset dir="dist/" prefix="${ant.project.name}-${DSTAMP}">
+        <include name="**/**"/>
+      </tarfileset>
+    </tar>
+  </target>
+
+  <target name="s3-package" if="package.remote.bucket">
+
+    <taskdef name="S3Upload" classname="dak.ant.taskdefs.S3Upload"/>
+
+    <S3Upload verbose="true"
+              accessId="${package.aws.accessId}"
+              secretKey="${package.aws.secretKey}"
+              bucket="${package.remote.bucket}"
+              prefix="${ant.project.name}/"
+              publicRead="true">
+      <fileset file="${ant.project.name}-${DSTAMP}.tgz"/>
+    </S3Upload>
+
+    <echo message="http://${package.remote.bucket}/multitool/${ant.project.name}-${DSTAMP}.tgz"
+          file="${ant.project.name}-current.txt"/>
+
+    <property name="package.remote.port" value="22"/>
+    <scp file="${ant.project.name}-current.txt"
+         remoteTofile="${package.remote.path}/${ant.project.name}/${ant.project.name}-${DSTAMP}.tgz"
+         keyfile="${package.remote.keyfile}"
+         passphrase="" port="${package.remote.port}" trust="true"/>
+
+    <delete file="${ant.project.name}-current.txt"/>
+
+  </target>
+
+  <target name="publish" depends="clean,test,tar,s3-package"/>
+
+</project>
