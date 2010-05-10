@@ -30,6 +30,8 @@ public class Options
   int dataMinWords = 10;
   String dataWordDelimiter = " "; // space
 
+  boolean countSort;
+
   public boolean isDebugLogging()
     {
     return debugLogging;
@@ -197,5 +199,18 @@ public class Options
   public void setDataWordDelimiter( String dataWordDelimiter )
     {
     this.dataWordDelimiter = dataWordDelimiter;
+    }
+
+  ////////////////////////////////////////
+
+  public boolean isCountSort()
+    {
+    return countSort;
+    }
+
+  @Option(name = "-c", aliases = {"--count-sort"}, usage = "run count sort load", required = false)
+  public void setCountSort( boolean countSort )
+    {
+    this.countSort = countSort;
     }
   }

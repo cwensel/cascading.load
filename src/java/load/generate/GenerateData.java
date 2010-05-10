@@ -24,24 +24,23 @@ import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
 import load.Options;
+import load.common.Load;
 import load.util.Util;
 import org.apache.hadoop.mapred.JobConf;
 
 /**
  *
  */
-public class GenerateData
+public class GenerateData extends Load
   {
-  Options options;
-  Properties properties;
   private String dictionaryPath;
 
   public GenerateData( Options options, Properties properties )
     {
-    this.options = options;
-    this.properties = new Properties( properties );
+    super( options, properties );
     }
 
+  @Override
   public Flow createFlow() throws Exception
     {
     dictionaryPath = writeDictionaryTuples();
@@ -55,6 +54,18 @@ public class GenerateData
     pipe = new Each( pipe, new TupleGenerator( options, new Fields( "line" ) ) );
 
     return new FlowConnector( properties ).connect( "generate-data", source, sink, pipe );
+    }
+
+  @Override
+  public String[] getInputPaths()
+    {
+    return new String[]{getDictionaryPath()};
+    }
+
+  @Override
+  public String[] getOutputPaths()
+    {
+    return new String[]{options.getInputRoot()};
     }
 
   public String getDictionaryPath()
