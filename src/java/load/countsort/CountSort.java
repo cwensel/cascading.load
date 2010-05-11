@@ -25,9 +25,8 @@ import cascading.tuple.Fields;
 import load.Options;
 import load.common.Load;
 
-/**
- *
- */
+
+/** Class CountSort does a simple word count and then sorts the counts in decreasing order. */
 public class CountSort extends Load
   {
   public CountSort( Options options, Properties properties )

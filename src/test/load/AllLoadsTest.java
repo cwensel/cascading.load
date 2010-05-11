@@ -11,6 +11,7 @@ import java.io.File;
 import cascading.flow.Flow;
 import load.countsort.CountSort;
 import load.generate.GenerateData;
+import load.join.MultiJoin;
 
 /**
  *
@@ -50,8 +51,18 @@ public class AllLoadsTest extends LoadTestCase
 
     countSortFlow.complete();
 
-    assertEquals( 6, new File( countSort.getInputPaths()[ 0 ] ).list().length );
     assertEquals( 2, new File( countSort.getOutputPaths()[ 0 ] ).list().length );
+
+    MultiJoin multiJoin = new MultiJoin( options, getProperties() );
+
+    Flow multiJoinFlow = multiJoin.createFlow();
+
+    multiJoinFlow.complete();
+
+    assertEquals( 2, new File( multiJoin.getOutputPaths()[ 0 ] ).list().length );
+    assertEquals( 2, new File( multiJoin.getOutputPaths()[ 1 ] ).list().length );
+    assertEquals( 2, new File( multiJoin.getOutputPaths()[ 2 ] ).list().length );
+    assertEquals( 2, new File( multiJoin.getOutputPaths()[ 3 ] ).list().length );
     }
 
   }

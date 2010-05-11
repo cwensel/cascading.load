@@ -28,9 +28,7 @@ import load.common.Load;
 import load.util.Util;
 import org.apache.hadoop.mapred.JobConf;
 
-/**
- *
- */
+/** Class GenerateData creates a test corpus of random words. */
 public class GenerateData extends Load
   {
   private String dictionaryPath;
