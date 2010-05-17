@@ -17,16 +17,22 @@ import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
 import cascading.operation.DebugLevel;
 import cascading.pipe.cogroup.CoGroupClosure;
+import load.countsort.CountSort;
 import load.generate.GenerateData;
+import load.join.MultiJoin;
 import load.util.Util;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class Main
   {
+  private static final Logger LOG = LoggerFactory.getLogger( Main.class );
+
   private Options options;
 
   public static void main( String[] args ) throws Exception
@@ -41,16 +47,33 @@ public class Main
     initOptions( args, options );
     }
 
-  private void execute() throws Exception
+  public boolean execute() throws Exception
     {
     List<Flow> flows = new ArrayList<Flow>();
 
     if( options.isDataGenerate() )
       flows.add( new GenerateData( options, getDefaultProperties() ).createFlow() );
 
+    if( options.isCountSort() )
+      flows.add( new CountSort( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isMultiJoin() )
+      flows.add( new MultiJoin( options, getDefaultProperties() ).createFlow() );
+
     Cascade cascade = new CascadeConnector( getDefaultProperties() ).connect( flows.toArray( new Flow[0] ) );
 
-    cascade.complete();
+    try
+      {
+      cascade.complete();
+      }
+    catch( Exception exception )
+      {
+      LOG.error( "failed running cascade ", exception );
+
+      return false;
+      }
+
+    return true;
     }
 
   protected Properties getDefaultProperties() throws IOException

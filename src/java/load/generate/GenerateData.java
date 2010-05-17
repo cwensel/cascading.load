@@ -44,7 +44,7 @@ public class GenerateData extends Load
     dictionaryPath = writeDictionaryTuples();
 
     Tap source = new Hfs( new TextLine( new Fields( "line" ) ), dictionaryPath );
-    Tap sink = new Hfs( new TextLine(), options.getInputRoot(), SinkMode.REPLACE );
+    Tap sink = new Hfs( new TextLine( new Fields( "line" ) ), options.getInputRoot(), SinkMode.REPLACE );
 
     Pipe pipe = new Pipe( "load-generator" );
 

@@ -18,7 +18,7 @@ import load.join.MultiJoin;
  */
 public class AllLoadsTest extends LoadTestCase
   {
-  String output = "build/test/output/generate/";
+  String output = "build/test/output/load/";
 
   public AllLoadsTest()
     {
@@ -27,6 +27,8 @@ public class AllLoadsTest extends LoadTestCase
 
   public void testAllLoads() throws Exception
     {
+    String output = this.output + "api/";
+
     Options options = new Options();
 
     options.setDataGenerate( true );
@@ -44,6 +46,8 @@ public class AllLoadsTest extends LoadTestCase
 
     assertEquals( 6, new File( generate.getInputPaths()[ 0 ] ).list().length );
     assertEquals( 6, new File( generate.getOutputPaths()[ 0 ] ).list().length );
+
+    options.setCountSort( true );
 
     CountSort countSort = new CountSort( options, getProperties() );
 
@@ -63,6 +67,30 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 2, new File( multiJoin.getOutputPaths()[ 1 ] ).list().length );
     assertEquals( 2, new File( multiJoin.getOutputPaths()[ 2 ] ).list().length );
     assertEquals( 2, new File( multiJoin.getOutputPaths()[ 3 ] ).list().length );
+    }
+
+  public void testMain() throws Exception
+    {
+    String output = this.output + "main/";
+
+    String[] args = new String[]{
+      "-S", output + "status",
+      "-I", output + "input",
+      "-W", output + "working",
+      "-O", output + "output",
+
+      "-g",
+      "-gf", "3",
+      "-gs", "1",
+
+      "-c",
+
+      "-m"
+    };
+
+    assertTrue( new Main( args ).execute() );
+
+    assertEquals( 5, new File( output + "output" ).list().length );
     }
 
   }

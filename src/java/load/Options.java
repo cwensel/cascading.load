@@ -32,6 +32,8 @@ public class Options
 
   boolean countSort;
 
+  boolean multiJoin;
+
   public boolean isDebugLogging()
     {
     return debugLogging;
@@ -212,5 +214,19 @@ public class Options
   public void setCountSort( boolean countSort )
     {
     this.countSort = countSort;
+    }
+
+  ////////////////////////////////////////
+
+
+  public boolean isMultiJoin()
+    {
+    return multiJoin;
+    }
+
+  @Option(name = "-m", aliases = {"--multi-join"}, usage = "run multi join load", required = false)
+  public void setMultiJoin( boolean multiJoin )
+    {
+    this.multiJoin = multiJoin;
     }
   }

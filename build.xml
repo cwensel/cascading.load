@@ -6,7 +6,7 @@
   ~ Project and contact information: http://www.concurrentinc.com/
   -->
 
-<project name="load" default="build" basedir=".">
+<project name="cascading.load" default="build" basedir=".">
 
   <!-- load properties first -->
   <property file="../build.properties"/>
