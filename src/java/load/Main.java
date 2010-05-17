@@ -6,7 +6,10 @@
 
 package load;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -17,10 +20,18 @@ import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
 import cascading.operation.DebugLevel;
 import cascading.pipe.cogroup.CoGroupClosure;
+import cascading.scheme.TextLine;
+import cascading.stats.CascadeStats;
+import cascading.tap.Hfs;
+import cascading.tap.SinkMode;
+import cascading.tuple.Tuple;
+import cascading.tuple.TupleEntryCollector;
 import load.countsort.CountSort;
 import load.generate.GenerateData;
 import load.join.MultiJoin;
+import load.util.StatsPrinter;
 import load.util.Util;
+import org.apache.hadoop.mapred.JobConf;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
@@ -62,6 +73,8 @@ public class Main
 
     Cascade cascade = new CascadeConnector( getDefaultProperties() ).connect( flows.toArray( new Flow[0] ) );
 
+    CascadeStats stats = cascade.getCascadeStats();
+
     try
       {
       cascade.complete();
@@ -71,6 +84,27 @@ public class Main
       LOG.error( "failed running cascade ", exception );
 
       return false;
+      }
+
+    stats.captureDetail();
+
+    OutputStream outputStream = options.hasStatsRoot() ? new ByteArrayOutputStream() : System.out;
+    PrintWriter writer = new PrintWriter( outputStream );
+
+    StatsPrinter.printCascadeStats( writer, stats );
+
+    if( options.hasStatsRoot() )
+      {
+      String[] lines = outputStream.toString().split( "\n" );
+
+      Hfs statsTap = new Hfs( new TextLine(), options.getStatsRoot(), SinkMode.REPLACE );
+
+      TupleEntryCollector tapWriter = statsTap.openForWrite( new JobConf() );
+
+      for( String line : lines )
+        tapWriter.add( new Tuple( line ) );
+
+      tapWriter.close();
       }
 
     return true;

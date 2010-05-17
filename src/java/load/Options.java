@@ -50,7 +50,7 @@ public class Options
     return mapSpecExec;
     }
 
-  @Option(name = "-SM", usage = "enable map side speculative execution", required = false)
+  @Option(name = "-EM", usage = "enable map side speculative execution", required = false)
   public void setMapSpecExec( boolean mapSpecExec )
     {
     this.mapSpecExec = mapSpecExec;
@@ -61,7 +61,7 @@ public class Options
     return reduceSpecExec;
     }
 
-  @Option(name = "-SR", usage = "enable reduce side speculative execution", required = false)
+  @Option(name = "-ER", usage = "enable reduce side speculative execution", required = false)
   public void setReduceSpecExec( boolean reduceSpecExec )
     {
     this.reduceSpecExec = reduceSpecExec;
@@ -113,12 +113,17 @@ public class Options
     this.workingRoot = workingRoot;
     }
 
+  public boolean hasStatsRoot()
+    {
+    return statsRoot != null;
+    }
+
   public String getStatsRoot()
     {
     return makePathDir( statsRoot );
     }
 
-  @Option(name = "-S", usage = "output path for job stats", required = true)
+  @Option(name = "-S", usage = "output path for job stats", required = false)
   public void setStatsRoot( String statsRoot )
     {
     this.statsRoot = statsRoot;
