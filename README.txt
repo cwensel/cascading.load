@@ -15,7 +15,7 @@ Welcome
 
 Building
 
- This release requires at least Cascading 1.1.1 built for your version
+ This release requires at least Cascading 1.1.2 built for your version
  of Hadoop. See the project site for downloads.
 
  To build a jar,
