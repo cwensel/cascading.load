@@ -4,12 +4,12 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load;
+package cascading.load;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import load.util.Util;
+import cascading.load.util.Util;
 import org.kohsuke.args4j.Option;
 
 /**
@@ -32,6 +32,8 @@ public class Options
   String outputRoot;
   String workingRoot = "working_" + System.currentTimeMillis() + "_" + (int) Math.random() * 1000;
   String statsRoot;
+
+  boolean runAllLoads = false;
 
   boolean dataGenerate;
   int dataNumFiles = 100;
@@ -218,6 +220,16 @@ public class Options
     return path;
     }
 
+  public boolean isRunAllLoads()
+    {
+    return runAllLoads;
+    }
+
+  @Option(name = "-ALL", usage = "run all available loads", required = false)
+  public void setRunAllLoads( boolean runAllLoads )
+    {
+    this.runAllLoads = runAllLoads;
+    }
 //////////////////////////////////
 
   public boolean isDataGenerate()
@@ -339,6 +351,13 @@ public class Options
 
   public void prepare()
     {
+    if( isReduceSpecExec() )
+      {
+      setDataGenerate( true );
+      setCountSort( true );
+      setMultiJoin( true );
+      }
+
     if( fillBlocksPerFile != -1 )
       dataFileSizeMB = blockSizeMB * fillBlocksPerFile;
 
@@ -346,27 +365,34 @@ public class Options
       dataNumFiles = Util.getMaxConcurrentMappers() * fillFilesPerAvailMapper;
     }
 
-
   @Override
   public String toString()
     {
     final StringBuilder sb = new StringBuilder();
     sb.append( "Options" );
     sb.append( "{debugLogging=" ).append( debugLogging );
+    sb.append( ", blockSizeMB=" ).append( blockSizeMB );
+    sb.append( ", numDefaultMappers=" ).append( numDefaultMappers );
+    sb.append( ", numDefaultReducers=" ).append( numDefaultReducers );
     sb.append( ", mapSpecExec=" ).append( mapSpecExec );
     sb.append( ", reduceSpecExec=" ).append( reduceSpecExec );
     sb.append( ", tupleSpillThreshold=" ).append( tupleSpillThreshold );
     sb.append( ", hadoopProperties=" ).append( hadoopProperties );
+    sb.append( ", numMappersPerBlock=" ).append( numMappersPerBlock );
+    sb.append( ", numReducersPerMapper=" ).append( numReducersPerMapper );
     sb.append( ", inputRoot='" ).append( inputRoot ).append( '\'' );
     sb.append( ", outputRoot='" ).append( outputRoot ).append( '\'' );
     sb.append( ", workingRoot='" ).append( workingRoot ).append( '\'' );
     sb.append( ", statsRoot='" ).append( statsRoot ).append( '\'' );
+    sb.append( ", runAllLoads=" ).append( runAllLoads );
     sb.append( ", dataGenerate=" ).append( dataGenerate );
     sb.append( ", dataNumFiles=" ).append( dataNumFiles );
     sb.append( ", dataFileSizeMB=" ).append( dataFileSizeMB );
     sb.append( ", dataMaxWords=" ).append( dataMaxWords );
     sb.append( ", dataMinWords=" ).append( dataMinWords );
     sb.append( ", dataWordDelimiter='" ).append( dataWordDelimiter ).append( '\'' );
+    sb.append( ", fillBlocksPerFile=" ).append( fillBlocksPerFile );
+    sb.append( ", fillFilesPerAvailMapper=" ).append( fillFilesPerAvailMapper );
     sb.append( ", countSort=" ).append( countSort );
     sb.append( ", multiJoin=" ).append( multiJoin );
     sb.append( '}' );

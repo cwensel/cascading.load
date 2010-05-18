@@ -4,7 +4,7 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load;
+package cascading.load;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,6 +18,11 @@ import cascading.cascade.Cascade;
 import cascading.cascade.CascadeConnector;
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
+import cascading.load.countsort.CountSort;
+import cascading.load.generate.GenerateData;
+import cascading.load.join.MultiJoin;
+import cascading.load.util.StatsPrinter;
+import cascading.load.util.Util;
 import cascading.operation.DebugLevel;
 import cascading.pipe.cogroup.CoGroupClosure;
 import cascading.scheme.TextLine;
@@ -26,11 +31,6 @@ import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
-import load.countsort.CountSort;
-import load.generate.GenerateData;
-import load.join.MultiJoin;
-import load.util.StatsPrinter;
-import load.util.Util;
 import org.apache.hadoop.mapred.JobConf;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -187,7 +187,7 @@ public class Main
       printUsageAndExit( parser );
       }
 
-//    options.prepare();
+    options.prepare();
 
     return options;
     }

@@ -4,7 +4,7 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load.generate;
+package cascading.load.generate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +13,9 @@ import java.util.Properties;
 
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
+import cascading.load.Options;
+import cascading.load.common.Load;
+import cascading.load.util.Util;
 import cascading.operation.regex.RegexSplitter;
 import cascading.pipe.Each;
 import cascading.pipe.Pipe;
@@ -23,9 +26,6 @@ import cascading.tap.Tap;
 import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
-import load.Options;
-import load.common.Load;
-import load.util.Util;
 import org.apache.hadoop.mapred.JobConf;
 
 /** Class GenerateData creates a test corpus of random words. */

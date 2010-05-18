@@ -4,17 +4,17 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load.generate;
+package cascading.load.generate;
 
 import java.util.Random;
 
 import cascading.flow.FlowProcess;
+import cascading.load.Options;
 import cascading.operation.BaseOperation;
 import cascading.operation.Function;
 import cascading.operation.FunctionCall;
 import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
-import load.Options;
 
 /**
  *

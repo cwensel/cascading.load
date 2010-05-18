@@ -4,14 +4,14 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load;
+package cascading.load;
 
 import java.io.File;
 
 import cascading.flow.Flow;
-import load.countsort.CountSort;
-import load.generate.GenerateData;
-import load.join.MultiJoin;
+import cascading.load.countsort.CountSort;
+import cascading.load.generate.GenerateData;
+import cascading.load.join.MultiJoin;
 
 /**
  *

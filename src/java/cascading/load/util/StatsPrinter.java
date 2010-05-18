@@ -4,7 +4,7 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load.util;
+package cascading.load.util;
 
 import java.io.PrintWriter;
 import java.util.Collection;

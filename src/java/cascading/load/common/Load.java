@@ -4,12 +4,12 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load.common;
+package cascading.load.common;
 
 import java.util.Properties;
 
 import cascading.flow.Flow;
-import load.Options;
+import cascading.load.Options;
 
 /**
  *

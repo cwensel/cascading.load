@@ -4,13 +4,15 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load.countsort;
+package cascading.load.countsort;
 
 import java.util.Collections;
 import java.util.Properties;
 
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
+import cascading.load.Options;
+import cascading.load.common.Load;
 import cascading.operation.aggregator.Count;
 import cascading.operation.regex.RegexSplitGenerator;
 import cascading.pipe.Each;
@@ -22,8 +24,6 @@ import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
-import load.Options;
-import load.common.Load;
 
 
 /** Class CountSort does a simple word count and then sorts the counts in decreasing order. */

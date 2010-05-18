@@ -4,7 +4,7 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load.join;
+package cascading.load.join;
 
 import java.util.Map;
 import java.util.Properties;
@@ -12,6 +12,8 @@ import java.util.Properties;
 import cascading.cascade.Cascades;
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
+import cascading.load.Options;
+import cascading.load.common.Load;
 import cascading.operation.aggregator.First;
 import cascading.operation.filter.Sample;
 import cascading.operation.regex.RegexSplitGenerator;
@@ -30,8 +32,6 @@ import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
-import load.Options;
-import load.common.Load;
 
 /**
  * Class MultiJoin uses the test corpus and performs both a split of of all the words into tuples and uniques all the

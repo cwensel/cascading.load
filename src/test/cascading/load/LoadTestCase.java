@@ -4,7 +4,7 @@
  * Project and contact information: http://www.concurrentinc.com/
  */
 
-package load;
+package cascading.load;
 
 import java.util.Properties;
 
