@@ -9,6 +9,7 @@ package load;
 import java.util.ArrayList;
 import java.util.List;
 
+import load.util.Util;
 import org.kohsuke.args4j.Option;
 
 /**
@@ -17,10 +18,15 @@ import org.kohsuke.args4j.Option;
 public class Options
   {
   boolean debugLogging = false;
+  int blockSizeMB = 64;
+  int numDefaultMappers = -1;
+  int numDefaultReducers = -1;
   boolean mapSpecExec = false;
   boolean reduceSpecExec = false;
   int tupleSpillThreshold = 100000;
   List<String> hadoopProperties = new ArrayList<String>();
+  int numMappersPerBlock = 1; // multiplier for num mappers, needs 1.2 wip for this
+  int numReducersPerMapper = -1;
 
   String inputRoot;
   String outputRoot;
@@ -33,6 +39,8 @@ public class Options
   int dataMaxWords = 10;
   int dataMinWords = 10;
   String dataWordDelimiter = " "; // space
+  int fillBlocksPerFile = -1;
+  int fillFilesPerAvailMapper = -1;
 
   boolean countSort;
 
@@ -47,6 +55,39 @@ public class Options
   public void setDebugLogging( boolean debugLogging )
     {
     this.debugLogging = debugLogging;
+    }
+
+  public int getBlockSizeMB()
+    {
+    return blockSizeMB;
+    }
+
+  @Option(name = "-BS", usage = "default block size", required = false)
+  public void setBlockSizeMB( int blockSizeMB )
+    {
+    this.blockSizeMB = blockSizeMB;
+    }
+
+  public int getNumDefaultMappers()
+    {
+    return numDefaultMappers;
+    }
+
+  @Option(name = "-NM", usage = "default num mappers", required = false)
+  public void setNumDefaultMappers( int numDefaultMappers )
+    {
+    this.numDefaultMappers = numDefaultMappers;
+    }
+
+  public int getNumDefaultReducers()
+    {
+    return numDefaultReducers;
+    }
+
+  @Option(name = "-NR", usage = "default num reducers", required = false)
+  public void setNumDefaultReducers( int numDefaultReducers )
+    {
+    this.numDefaultReducers = numDefaultReducers;
     }
 
   public boolean isMapSpecExec()
@@ -88,9 +129,31 @@ public class Options
     }
 
   @Option(name = "-DH", usage = "optional Hadoop config job properties", required = false, multiValued = true)
-  public void setHadoopProperties( List<String> hadoopProperties )
+  public void setHadoopProperties( String hadoopProperty )
     {
-    this.hadoopProperties = hadoopProperties;
+    this.hadoopProperties.add( hadoopProperty );
+    }
+
+  public int getNumMappersPerBlock()
+    {
+    return numMappersPerBlock;
+    }
+
+  @Option(name = "-MB", usage = "mappers per block (unused)", required = false)
+  public void setNumMappersPerBlock( int numMappersPerBlock )
+    {
+    this.numMappersPerBlock = numMappersPerBlock;
+    }
+
+  public int getNumReducersPerMapper()
+    {
+    return numReducersPerMapper;
+    }
+
+  @Option(name = "-RM", usage = "reducers per mapper (unused)", required = false)
+  public void setNumReducersPerMapper( int numReducersPerMapper )
+    {
+    this.numReducersPerMapper = numReducersPerMapper;
     }
 
   //////////////////////////////////
@@ -223,6 +286,29 @@ public class Options
     this.dataWordDelimiter = dataWordDelimiter;
     }
 
+  public int getFillBlocksPerFile()
+    {
+    return fillBlocksPerFile;
+    }
+
+  @Option(name = "-gbf", aliases = {"--generate-blocks-per-file"}, usage = "fill num blocks per file", required = false)
+  public void setFillBlocksPerFile( int fillBlocksPerFile )
+    {
+    this.fillBlocksPerFile = fillBlocksPerFile;
+    }
+
+  public int getFillFilesPerAvailMapper()
+    {
+    return fillFilesPerAvailMapper;
+    }
+
+  @Option(name = "-gfm", aliases = {
+    "--generate-files-per-mapper"}, usage = "fill num files per available mapper", required = false)
+  public void setFillFilesPerAvailMapper( int fillFilesPerAvailMapper )
+    {
+    this.fillFilesPerAvailMapper = fillFilesPerAvailMapper;
+    }
+
   ////////////////////////////////////////
 
   public boolean isCountSort()
@@ -250,6 +336,15 @@ public class Options
     }
 
   ////////////////////////////////////////
+
+  public void prepare()
+    {
+    if( fillBlocksPerFile != -1 )
+      dataFileSizeMB = blockSizeMB * fillBlocksPerFile;
+
+    if( fillFilesPerAvailMapper != -1 )
+      dataNumFiles = Util.getMaxConcurrentMappers() * fillFilesPerAvailMapper;
+    }
 
 
   @Override

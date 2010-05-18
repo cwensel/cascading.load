@@ -141,8 +141,16 @@ public class Main
     // -XX:+UseParallelOldGC -XX:ParallelGCThreads=1
     properties.setProperty( "mapred.child.java.opts", "-server -Xmx1000m -XX:+UseParallelOldGC" );
 
+    if( options.getNumDefaultMappers() != -1 )
+      properties.setProperty( "mapred.map.tasks", Integer.toString( options.getNumDefaultMappers() ) );
+
+    if( options.getNumDefaultReducers() != -1 )
+      properties.setProperty( "mapred.reduce.tasks", Integer.toString( options.getNumDefaultReducers() ) );
+
     properties.setProperty( "mapred.map.tasks.speculative.execution", options.isMapSpecExec() ? "true" : "false" );
     properties.setProperty( "mapred.reduce.tasks.speculative.execution", options.isReduceSpecExec() ? "true" : "false" );
+
+    properties.setProperty( "dfs.block.size", Long.toString( options.getBlockSizeMB() * 1024 * 1024 ) );
 
     // need to try and detect if native codecs are loaded, if so, use gzip
     if( Util.hasNativeZlib() )

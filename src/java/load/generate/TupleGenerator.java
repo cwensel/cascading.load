@@ -46,7 +46,7 @@ class TupleGenerator extends BaseOperation implements Function
     Tuple words = new Tuple();
     Tuple output = new Tuple( "" );
 
-    while( currentBytes < dataFileSizeMB * 1024 * 1024 )
+    while( true )
       {
       int numWords = getRandomWords( random );
 
@@ -57,6 +57,9 @@ class TupleGenerator extends BaseOperation implements Function
 
       String line = words.toString( dataWordDelimiter );
       currentBytes += line.getBytes().length;
+
+      if( currentBytes > dataFileSizeMB * 1024 * 1024 ) // don't go over to prevent small blocks
+        break;
 
       output.set( 0, line );
 

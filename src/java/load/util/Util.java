@@ -19,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.hadoop.io.compress.zlib.ZlibFactory;
+import org.apache.hadoop.mapred.ClusterStatus;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 
 /**
@@ -151,6 +153,35 @@ public class Util
 //
 //    properties.setProperty( "mapred.reduce.tasks", Integer.toString( trackers * jobConf.getInt( "mapred.tasktracker.reduce.tasks.maximum", 2 ) ) );
 //    }
+
+  public static int getNumTaskTrackers( JobConf jobConf )
+    {
+    try
+      {
+      JobClient jobClient = new JobClient( jobConf );
+      ClusterStatus status = jobClient.getClusterStatus();
+
+      return status.getTaskTrackers();
+      }
+    catch( IOException exception )
+      {
+      throw new RuntimeException( "failed accessing hadoop cluster", exception );
+      }
+    }
+
+  public static int getMaxConcurrentMappers()
+    {
+    JobConf jobConf = new JobConf();
+
+    return getNumTaskTrackers( jobConf ) * jobConf.getInt( "mapred.tasktracker.map.tasks.maximum", 2 );
+    }
+
+  public static int getMaxConcurrentReducers()
+    {
+    JobConf jobConf = new JobConf();
+
+    return getNumTaskTrackers( jobConf ) * jobConf.getInt( "mapred.tasktracker.reduce.tasks.maximum", 2 );
+    }
 
   public static boolean hasNativeZlib()
     {
