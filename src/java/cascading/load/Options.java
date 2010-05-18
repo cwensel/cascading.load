@@ -351,7 +351,7 @@ public class Options
 
   public void prepare()
     {
-    if( isReduceSpecExec() )
+    if( isRunAllLoads() )
       {
       setDataGenerate( true );
       setCountSort( true );
