@@ -6,6 +6,9 @@
 
 package load;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.kohsuke.args4j.Option;
 
 /**
@@ -17,6 +20,7 @@ public class Options
   boolean mapSpecExec = false;
   boolean reduceSpecExec = false;
   int tupleSpillThreshold = 100000;
+  List<String> hadoopProperties = new ArrayList<String>();
 
   String inputRoot;
   String outputRoot;
@@ -76,6 +80,17 @@ public class Options
   public void setTupleSpillThreshold( int tupleSpillThreshold )
     {
     this.tupleSpillThreshold = tupleSpillThreshold;
+    }
+
+  public List<String> getHadoopProperties()
+    {
+    return hadoopProperties;
+    }
+
+  @Option(name = "-DH", usage = "optional Hadoop config job properties", required = false, multiValued = true)
+  public void setHadoopProperties( List<String> hadoopProperties )
+    {
+    this.hadoopProperties = hadoopProperties;
     }
 
   //////////////////////////////////
@@ -223,7 +238,6 @@ public class Options
 
   ////////////////////////////////////////
 
-
   public boolean isMultiJoin()
     {
     return multiJoin;
@@ -233,5 +247,34 @@ public class Options
   public void setMultiJoin( boolean multiJoin )
     {
     this.multiJoin = multiJoin;
+    }
+
+  ////////////////////////////////////////
+
+
+  @Override
+  public String toString()
+    {
+    final StringBuilder sb = new StringBuilder();
+    sb.append( "Options" );
+    sb.append( "{debugLogging=" ).append( debugLogging );
+    sb.append( ", mapSpecExec=" ).append( mapSpecExec );
+    sb.append( ", reduceSpecExec=" ).append( reduceSpecExec );
+    sb.append( ", tupleSpillThreshold=" ).append( tupleSpillThreshold );
+    sb.append( ", hadoopProperties=" ).append( hadoopProperties );
+    sb.append( ", inputRoot='" ).append( inputRoot ).append( '\'' );
+    sb.append( ", outputRoot='" ).append( outputRoot ).append( '\'' );
+    sb.append( ", workingRoot='" ).append( workingRoot ).append( '\'' );
+    sb.append( ", statsRoot='" ).append( statsRoot ).append( '\'' );
+    sb.append( ", dataGenerate=" ).append( dataGenerate );
+    sb.append( ", dataNumFiles=" ).append( dataNumFiles );
+    sb.append( ", dataFileSizeMB=" ).append( dataFileSizeMB );
+    sb.append( ", dataMaxWords=" ).append( dataMaxWords );
+    sb.append( ", dataMinWords=" ).append( dataMinWords );
+    sb.append( ", dataWordDelimiter='" ).append( dataWordDelimiter ).append( '\'' );
+    sb.append( ", countSort=" ).append( countSort );
+    sb.append( ", multiJoin=" ).append( multiJoin );
+    sb.append( '}' );
+    return sb.toString();
     }
   }

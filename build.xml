@@ -191,7 +191,9 @@
 
     <jar jarfile="${build.dir}/${ant.project.name}.jar">
       <fileset dir="${build.classes}"/>
-      <fileset dir="${basedir}" includes="lib/"/>
+      <fileset dir="${basedir}" includes="lib/">
+        <exclude name="**/build/**"/>
+      </fileset>
       <manifest>
         <attribute name="Main-Class" value="${ant.project.name}/Main"/>
       </manifest>
@@ -208,7 +210,7 @@
       <fileset dir=".">
         <include name="data/**"/>
         <include name="src/**"/>
-        <!--<include name="lib/**"/>-->
+        <include name="lib/**"/>
         <include name="build.xml"/>
         <include name="README.TXT"/>
       </fileset>

@@ -86,10 +86,19 @@ public class Main
       return false;
       }
 
+    printSummary( stats );
+
+    return true;
+    }
+
+  private void printSummary( CascadeStats stats ) throws IOException
+    {
     stats.captureDetail();
 
     OutputStream outputStream = options.hasStatsRoot() ? new ByteArrayOutputStream() : System.out;
     PrintWriter writer = new PrintWriter( outputStream );
+
+    writer.println( options );
 
     StatsPrinter.printCascadeStats( writer, stats );
 
@@ -106,8 +115,6 @@ public class Main
 
       tapWriter.close();
       }
-
-    return true;
     }
 
   protected Properties getDefaultProperties() throws IOException
@@ -142,6 +149,12 @@ public class Main
       properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );
     else
       properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.DefaultCodec" );
+
+    for( String property : options.getHadoopProperties() )
+      {
+      String[] split = property.split( "=" );
+      properties.setProperty( split[ 0 ], split[ 1 ] );
+      }
 
     FlowConnector.setApplicationJarClass( properties, Main.class );
 
