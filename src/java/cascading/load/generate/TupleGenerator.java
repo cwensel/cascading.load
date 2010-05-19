@@ -34,6 +34,9 @@ class TupleGenerator extends BaseOperation implements Function
     dataMaxWords = options.getDataMaxWords();
     dataMinWords = options.getDataMinWords();
     dataWordDelimiter = options.getDataWordDelimiter();
+
+    if( dataMaxWords < dataMinWords )
+      throw new IllegalArgumentException( "max words must not be less than min words" );
     }
 
   @Override
