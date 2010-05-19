@@ -32,17 +32,16 @@ import cascading.tap.SinkMode;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.log4j.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class Main
   {
-  private static final Logger LOG = LoggerFactory.getLogger( Main.class );
+  private static final Logger LOG = Logger.getLogger( Options.class );
 
   private Options options;
 

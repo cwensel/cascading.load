@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cascading.load.util.Util;
+import org.apache.log4j.Logger;
 import org.kohsuke.args4j.Option;
 
 /**
@@ -17,6 +18,8 @@ import org.kohsuke.args4j.Option;
  */
 public class Options
   {
+  private static final Logger LOG = Logger.getLogger( Options.class );
+
   boolean debugLogging = false;
   int blockSizeMB = 64;
   int numDefaultMappers = -1;
@@ -359,10 +362,22 @@ public class Options
       }
 
     if( fillBlocksPerFile != -1 )
+      {
       dataFileSizeMB = blockSizeMB * fillBlocksPerFile;
+      LOG.info( "using file size (MB): " + dataFileSizeMB );
+      }
 
     if( fillFilesPerAvailMapper != -1 )
+      {
       dataNumFiles = Util.getMaxConcurrentMappers() * fillFilesPerAvailMapper;
+      LOG.info( "using num files: " + dataNumFiles );
+      }
+
+    if( dataMaxWords < dataMinWords )
+      {
+      dataMaxWords = dataMinWords;
+      LOG.info( "using max words: " + dataMaxWords );
+      }
     }
 
   @Override
