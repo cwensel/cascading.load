@@ -57,7 +57,12 @@ public class Pipeline extends Load
       pipe = new Each( pipe, new Fields( "count2" ), new Identity( new Fields( "count" ) ), new Fields( "line", "count" ) );
       }
 
-    pipe = new Each( pipe, new Fields( "line" ), new ExpressionFunction( new Fields( "hash" ), "line.hashCode() % 1000000", String.class ), Fields.ALL ); // want some collisions
+    int modulo = 1000000;
+
+    if( options.getHashModulo() != -1 )
+      modulo = options.getHashModulo();
+
+    pipe = new Each( pipe, new Fields( "line" ), new ExpressionFunction( new Fields( "hash" ), "line.hashCode() % " + modulo, String.class ), Fields.ALL ); // want some collisions
 
     pipe = new GroupBy( pipe, new Fields( "hash" ) );
 

@@ -54,6 +54,7 @@ public class Options
   boolean multiJoin;
 
   boolean pipeline;
+  int hashModulo = -1;
 
 
   public boolean isDebugLogging()
@@ -390,6 +391,17 @@ public class Options
     this.pipeline = pipeline;
     }
 
+  public int getHashModulo()
+    {
+    return hashModulo;
+    }
+
+  @Option(name = "-pm", aliases = {
+    "--pipeline-hash-modulo"}, usage = "hash modulo for managing key distribution", required = false)
+  public void setHashModulo( int hashModulo )
+    {
+    this.hashModulo = hashModulo;
+    }
 
   ////////////////////////////////////////
 
