@@ -57,16 +57,18 @@ public class Pipeline extends Load
       pipe = new Each( pipe, new Fields( "count2" ), new Identity( new Fields( "count" ) ), new Fields( "line", "count" ) );
       }
 
-    pipe = new GroupBy( pipe, new Fields( "count" ) );
+    pipe = new Each( pipe, new Fields( "line" ), new ExpressionFunction( new Fields( "hash" ), "line.hashCode() % 1000000", String.class ), Fields.ALL ); // want some collisions
+
+    pipe = new GroupBy( pipe, new Fields( "hash" ) );
 
     for( int i = 0; i < 50; i++ )
       pipe = new Every( pipe, new Fields( "count" ), new Sum( new Fields( "sum" + ( i + 1 ) ) ) );
 
     for( int i = 0; i < 50; i++ )
       {
-      pipe = new Each( pipe, new Fields( "count" ), new Identity( new Fields( 0 ) ), Fields.ALL );
+      pipe = new Each( pipe, new Fields( "hash" ), new Identity( new Fields( 0 ) ), Fields.ALL );
       pipe = new Each( pipe, new Fields( "sum1" ), new Identity( new Fields( 0 ) ), Fields.ALL );
-      pipe = new Each( pipe, new Fields( "count", "sum1" ), new Identity(), Fields.SWAP );
+      pipe = new Each( pipe, new Fields( "hash", "sum1" ), new Identity(), Fields.SWAP );
       }
 
     return new FlowConnector( properties ).connect( "pipeline", source, sink, pipe );
