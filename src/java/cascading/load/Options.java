@@ -24,6 +24,8 @@ public class Options
   int blockSizeMB = 64;
   int numDefaultMappers = -1;
   int numDefaultReducers = -1;
+  float percentMaxMappers = 0;
+  float percentMaxReducers = 0;
   boolean mapSpecExec = false;
   boolean reduceSpecExec = false;
   int tupleSpillThreshold = 100000;
@@ -50,6 +52,9 @@ public class Options
   boolean countSort;
 
   boolean multiJoin;
+
+  boolean pipeline;
+
 
   public boolean isDebugLogging()
     {
@@ -93,6 +98,28 @@ public class Options
   public void setNumDefaultReducers( int numDefaultReducers )
     {
     this.numDefaultReducers = numDefaultReducers;
+    }
+
+  public float getPercentMaxMappers()
+    {
+    return percentMaxMappers;
+    }
+
+  @Option(name = "-PM", usage = "percent of max mappers", required = false)
+  public void setPercentMaxMappers( float percentMaxMappers )
+    {
+    this.percentMaxMappers = percentMaxMappers;
+    }
+
+  public float getPercentMaxReducers()
+    {
+    return percentMaxReducers;
+    }
+
+  @Option(name = "-PR", usage = "percent of max reducers", required = false)
+  public void setPercentMaxReducers( float percentMaxReducers )
+    {
+    this.percentMaxReducers = percentMaxReducers;
     }
 
   public boolean isMapSpecExec()
@@ -352,6 +379,20 @@ public class Options
 
   ////////////////////////////////////////
 
+  public boolean isPipeline()
+    {
+    return pipeline;
+    }
+
+  @Option(name = "-p", aliases = {"--pipeline"}, usage = "run pipeline load", required = false)
+  public void setPipeline( boolean pipeline )
+    {
+    this.pipeline = pipeline;
+    }
+
+
+  ////////////////////////////////////////
+
   public void prepare()
     {
     if( isRunAllLoads() )
@@ -359,7 +400,20 @@ public class Options
       setDataGenerate( true );
       setCountSort( true );
       setMultiJoin( true );
+      setPipeline( true );
       }
+
+    if( numDefaultMappers == -1 && percentMaxMappers != 0 )
+      numDefaultMappers = (int) ( Util.getMaxConcurrentMappers() * percentMaxMappers );
+
+    if( numDefaultReducers == -1 && percentMaxReducers != 0 )
+      numDefaultReducers = (int) ( Util.getMaxConcurrentReducers() * percentMaxReducers );
+
+    if( numDefaultMappers != -1 )
+      LOG.info( "using default mappers: " + numDefaultMappers );
+
+    if( numDefaultReducers != -1 )
+      LOG.info( "using default reducers: " + numDefaultReducers );
 
     if( fillBlocksPerFile != -1 )
       {
@@ -389,6 +443,8 @@ public class Options
     sb.append( ", blockSizeMB=" ).append( blockSizeMB );
     sb.append( ", numDefaultMappers=" ).append( numDefaultMappers );
     sb.append( ", numDefaultReducers=" ).append( numDefaultReducers );
+    sb.append( ", percentMaxMappers=" ).append( percentMaxMappers );
+    sb.append( ", percentMaxReducers=" ).append( percentMaxReducers );
     sb.append( ", mapSpecExec=" ).append( mapSpecExec );
     sb.append( ", reduceSpecExec=" ).append( reduceSpecExec );
     sb.append( ", tupleSpillThreshold=" ).append( tupleSpillThreshold );

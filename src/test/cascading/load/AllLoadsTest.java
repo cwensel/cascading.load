@@ -12,6 +12,7 @@ import cascading.flow.Flow;
 import cascading.load.countsort.CountSort;
 import cascading.load.generate.GenerateData;
 import cascading.load.join.MultiJoin;
+import cascading.load.pipeline.Pipeline;
 
 /**
  *
@@ -67,6 +68,14 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 2, new File( multiJoin.getOutputPaths()[ 1 ] ).list().length );
     assertEquals( 2, new File( multiJoin.getOutputPaths()[ 2 ] ).list().length );
     assertEquals( 2, new File( multiJoin.getOutputPaths()[ 3 ] ).list().length );
+
+    Pipeline pipeline = new Pipeline( options, getProperties() );
+
+    Flow pipelineFlow = pipeline.createFlow();
+
+    pipelineFlow.complete();
+
+    assertEquals( 2, new File( pipeline.getOutputPaths()[ 0 ] ).list().length );
     }
 
   public void testMain() throws Exception
@@ -85,12 +94,14 @@ public class AllLoadsTest extends LoadTestCase
 
       "-c",
 
-      "-m"
+      "-m",
+
+      "-p"
     };
 
     assertTrue( new Main( args ).execute() );
 
-    assertEquals( 5, new File( output + "output" ).list().length );
+    assertEquals( 6, new File( output + "output" ).list().length );
     }
 
   }

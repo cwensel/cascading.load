@@ -22,7 +22,8 @@ public abstract class Load
   public Load( Options options, Properties properties )
     {
     this.options = options;
-    this.properties = new Properties( properties );
+//    this.properties = new Properties( properties );
+    this.properties = properties;
     }
 
   public abstract Flow createFlow() throws Exception;

@@ -21,6 +21,7 @@ import cascading.flow.FlowConnector;
 import cascading.load.countsort.CountSort;
 import cascading.load.generate.GenerateData;
 import cascading.load.join.MultiJoin;
+import cascading.load.pipeline.Pipeline;
 import cascading.load.util.StatsPrinter;
 import cascading.load.util.Util;
 import cascading.operation.DebugLevel;
@@ -69,6 +70,9 @@ public class Main
 
     if( options.isMultiJoin() )
       flows.add( new MultiJoin( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isPipeline() )
+      flows.add( new Pipeline( options, getDefaultProperties() ).createFlow() );
 
     Cascade cascade = new CascadeConnector( getDefaultProperties() ).connect( flows.toArray( new Flow[0] ) );
 
@@ -165,10 +169,6 @@ public class Main
 
     FlowConnector.setApplicationJarClass( properties, Main.class );
 
-    // localized hadoop deps
-    // reducers = num task trackers * num reduce slots
-//    Util.setReducers( properties );
-
     return properties;
     }
 
@@ -187,6 +187,8 @@ public class Main
       }
 
     options.prepare();
+
+    LOG.info( options );
 
     return options;
     }
