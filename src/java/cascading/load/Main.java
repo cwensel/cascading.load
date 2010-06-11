@@ -157,9 +157,15 @@ public class Main
 
     // need to try and detect if native codecs are loaded, if so, use gzip
     if( Util.hasNativeZlib() )
+      {
       properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );
+      LOG.info( "using native codec for gzip" );
+      }
     else
+      {
       properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.DefaultCodec" );
+      LOG.info( "native codec not found" );
+      }
 
     for( String property : options.getHadoopProperties() )
       {
