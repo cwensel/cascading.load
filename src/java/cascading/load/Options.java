@@ -42,7 +42,7 @@ public class Options
 
   boolean dataGenerate;
   int dataNumFiles = 100;
-  int dataFileSizeMB = 100;
+  float dataFileSizeMB = 100;
   int dataMaxWords = 10;
   int dataMinWords = 10;
   String dataWordDelimiter = " "; // space
@@ -285,13 +285,13 @@ public class Options
     this.dataNumFiles = dataNumFiles;
     }
 
-  public int getDataFileSizeMB()
+  public float getDataFileSizeMB()
     {
     return dataFileSizeMB;
     }
 
   @Option(name = "-gs", aliases = {"--generate-file-size"}, usage = "size in MB of each file", required = false)
-  public void setDataFileSizeMB( int dataFileSizeMB )
+  public void setDataFileSizeMB( float dataFileSizeMB )
     {
     this.dataFileSizeMB = dataFileSizeMB;
     }

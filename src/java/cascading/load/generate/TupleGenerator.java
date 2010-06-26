@@ -21,7 +21,7 @@ import cascading.tuple.Tuple;
  */
 class TupleGenerator extends BaseOperation implements Function
   {
-  int dataFileSizeMB = 100;
+  float dataFileSizeMB = 100;
   int dataMaxWords = 10;
   int dataMinWords = 10;
   String dataWordDelimiter = " "; // space
