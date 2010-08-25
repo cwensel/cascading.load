@@ -74,4 +74,39 @@ class TupleGenerator extends BaseOperation implements Function
     {
     return dataMaxWords == dataMinWords ? dataMaxWords : random.nextInt( dataMaxWords - dataMinWords + 1 ) + dataMinWords;
     }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    if( this == object )
+      return true;
+    if( !( object instanceof TupleGenerator ) )
+      return false;
+    if( !super.equals( object ) )
+      return false;
+
+    TupleGenerator that = (TupleGenerator) object;
+
+    if( Float.compare( that.dataFileSizeMB, dataFileSizeMB ) != 0 )
+      return false;
+    if( dataMaxWords != that.dataMaxWords )
+      return false;
+    if( dataMinWords != that.dataMinWords )
+      return false;
+    if( dataWordDelimiter != null ? !dataWordDelimiter.equals( that.dataWordDelimiter ) : that.dataWordDelimiter != null )
+      return false;
+
+    return true;
+    }
+
+  @Override
+  public int hashCode()
+    {
+    int result = super.hashCode();
+    result = 31 * result + ( dataFileSizeMB != +0.0f ? Float.floatToIntBits( dataFileSizeMB ) : 0 );
+    result = 31 * result + dataMaxWords;
+    result = 31 * result + dataMinWords;
+    result = 31 * result + ( dataWordDelimiter != null ? dataWordDelimiter.hashCode() : 0 );
+    return result;
+    }
   }
