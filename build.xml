@@ -6,28 +6,11 @@
   ~ Project and contact information: http://www.concurrentinc.com/
   -->
 
-<project name="cascading.load" default="build" basedir=".">
+<project name="cascading.load" default="build" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <!-- load properties first -->
   <property file="../build.properties"/>
   <property file="./build.properties"/>
-
-  <!-- these are optional, only used if you uncomment the project.class.path filesets below -->
-  <property name="hadoop.home" location="${basedir}/../hadoop"/>
-  <property name="hadoop.lib" location="${hadoop.home}/lib"/>
-
-  <!-- assumes Cascading shares the same parent directory, change if necessary -->
-  <property name="cascading.home" location="${basedir}/../cascading"/>
-  <property name="cascading.libs" value="${cascading.home}/lib"/>
-  <property name="cascading.libs.core" value="${cascading.libs}"/>
-  <property name="cascading.libs.xml" value="${cascading.libs}/xml"/>
-
-  <condition property="cascading.path" value="${cascading.home}/build"
-             else="${cascading.home}">
-    <available file="${cascading.home}/build"/>
-  </condition>
-
-  <property file="${cascading.home}/version.properties"/>
 
   <property name="src.dir" location="${basedir}/src/java"/>
   <property name="src.data" location="${basedir}/src/data"/>
@@ -36,9 +19,10 @@
   <available file="${src.dir}" type="dir" property="main.available"/>
   <available file="${src.test}" type="dir" property="test.available"/>
 
-  <property name="conf.dir" location="${hadoop.home}/conf"/>
-
   <property name="lib.dir" location="${basedir}/lib"/>
+  <property name="compile.lib.dir" location="${lib.dir}/compile"/>
+  <property name="runtime.lib.dir" location="${lib.dir}/runtime"/>
+  <property name="test.lib.dir" location="${lib.dir}/test"/>
 
   <property name="build.dir" location="${basedir}/build/"/>
   <property name="build.classes" location="${build.dir}/classes"/>
@@ -49,42 +33,26 @@
 
   <property name="dist" location="dist"/>
 
+  <fileset id="lib.compile.fileset" dir="${compile.lib.dir}">
+    <include name="*.jar"/>
+  </fileset>
+
+  <fileset id="lib.runtime.fileset" dir="${runtime.lib.dir}">
+    <include name="*.jar"/>
+  </fileset>
+
+  <fileset id="lib.test.fileset" dir="${test.lib.dir}">
+    <include name="*.jar"/>
+  </fileset>
+
+
   <path id="project.class.path">
     <pathelement location="${build.classes}"/>
     <pathelement location="${build.test}"/>
 
-    <fileset dir="${cascading.path}">
-      <include name="cascading-core-*.jar"/>
-      <include name="cascading-xml-*.jar"/>
-      <include name="cascading-test-*.jar"/>
-    </fileset>
-
-    <fileset dir="${cascading.libs.core}">
-      <include name="*.jar"/>
-    </fileset>
-
-    <fileset dir="${cascading.libs.xml}">
-      <include name="*.jar"/>
-    </fileset>
-
-    <fileset dir="${lib.dir}">
-      <include name="*.jar"/>
-    </fileset>
-
-    <pathelement location="${hadoop.home}"/>
-
-    <fileset dir="${hadoop.lib}">
-      <include name="*.jar"/>
-    </fileset>
-
-    <fileset dir="${hadoop.home}">
-      <include name="*.jar"/>
-    </fileset>
-
-    <fileset dir="${hadoop.home}/build" erroronmissingdir="false">
-      <include name="*.jar"/>
-    </fileset>
-
+    <fileset refid="lib.compile.fileset"/>
+    <fileset refid="lib.runtime.fileset"/>
+    <fileset refid="lib.test.fileset"/>
   </path>
 
   <target name="clean">
@@ -100,7 +68,6 @@
 
     <echo message="building..."/>
     <mkdir dir="${build.classes}"/>
-    <mkdir dir="${lib.dir}"/>
 
     <javac srcdir="${src.dir}" destdir="${build.classes}" verbose="off" debug="true" includeantruntime="false">
       <classpath refid="project.class.path"/>
@@ -126,7 +93,7 @@
     <mkdir dir="${build.test}"/>
     <mkdir dir="${lib.dir}"/>
 
-    <javac srcdir="${src.test}" destdir="${build.test}" verbose="off">
+    <javac srcdir="${src.test}" destdir="${build.test}" verbose="off" includeantruntime="false">
       <classpath refid="project.class.path"/>
     </javac>
 
@@ -181,19 +148,12 @@
 
     <!-- copy Cascading classes and libraries -->
     <copy todir="${build.classes}/lib">
-      <fileset dir="${cascading.path}">
-        <include name="cascading-core-*.jar"/>
-        <include name="cascading-xml-*.jar"/>
-      </fileset>
-      <fileset dir="${cascading.libs.core}" includes="*.jar"/>
-      <fileset dir="${cascading.libs.xml}" includes="*.jar"/>
+      <fileset refid="lib.compile.fileset"/>
+      <mapper type="flatten"/>
     </copy>
 
     <jar jarfile="${build.dir}/${ant.project.name}.jar">
       <fileset dir="${build.classes}"/>
-      <fileset dir="${basedir}" includes="lib/">
-        <exclude name="**/build/**"/>
-      </fileset>
       <manifest>
         <attribute name="Main-Class" value="${ant.project.name}/Main"/>
       </manifest>
@@ -259,5 +219,19 @@
   </target>
 
   <target name="publish" depends="clean,test,tar,s3-package"/>
+
+  <target name="retrieve">
+
+    <ivy:settings id="ivy.conjars.settings" url="http://conjars.org/repo/ivysettings.xml"/>
+
+    <!--<ivy:cleancache settingsRef="ivy.conjars.settings"/>-->
+
+    <!--<ivy:resolve settingsRef="ivy.conjars.settings" transitive="false"/>-->
+
+    <ivy:retrieve settingsRef="ivy.conjars.settings"
+                  conf="compile,runtime,test"
+                  pattern="${lib.dir}/[conf]/[artifact]-[revision].[ext]" sync="true"/>
+
+  </target>
 
 </project>
