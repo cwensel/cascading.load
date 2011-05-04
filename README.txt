@@ -15,21 +15,16 @@ Welcome
 
 Building
 
- This release requires at least Cascading 1.1.2 built for your version
- of Hadoop. See the project site for downloads.
+ This release requires at least Cascading 1.2.x and will pull all dependencies from
+ the relevant maven repos, including conjars.org.
 
  To build a jar,
 
- > ant -Dcascading.home=... -Dhadoop.home=... jar
+ > ant retrieve jar
 
  To test,
 
- > ant -Dcascading.home=... -Dhadoop.home=... test
-
- where "..." is the install path of each of the dependencies.
-
- Optionally, a build.properties file can be created in the project root
- that defines the *.home properties above.
+ > ant test
 
 Using
 
@@ -41,12 +36,4 @@ Using
 
 License
 
-  Copyright (c) 2010 Concurrent, Inc.
-
-  This work has been released into the public domain
-  by the copyright holder. This applies worldwide.
-
-  In case this is not legally possible:
-  The copyright holder grants any entity the right
-  to use this work for any purpose, without any
-  conditions, unless such conditions are required by law.
+ See LICENSE.txt

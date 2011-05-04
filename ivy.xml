@@ -24,7 +24,7 @@
 
   <dependencies>
 
-    <dependency org="cascading" name="cascading-core" rev="1.2-wip-+" conf="compile->master,compile"
+    <dependency org="cascading" name="cascading-core" rev="1.2.3" conf="compile->master,compile"
                 changing="true"/>
     <dependency org="args4j" name="args4j" rev="2.0.12" conf="compile->default"/>
 
@@ -34,7 +34,7 @@
     <dependency org="org.apache.hadoop" name="hadoop-test" rev="0.20.2" conf="runtime->default"/>
     <dependency org="log4j" name="log4j" rev="1.2.15" conf="runtime->master"/>
 
-    <dependency org="cascading" name="cascading-test" rev="1.2-wip-+" conf="test->master,compile"
+    <dependency org="cascading" name="cascading-test" rev="1.2.3" conf="test->master,compile"
                 changing="true"/>
 
   </dependencies>
