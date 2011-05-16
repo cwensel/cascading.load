@@ -1,6 +1,6 @@
 Welcome
 
- This is the Cascading.Load module.
+ This is the Cascading.Load application.
 
  It provides a simple command line interface for building high load cluster jobs.
 
