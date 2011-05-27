@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Copyright (c) 2011 Concurrent, Inc.
+
+if [ -z "$CT_PATH" ]
+then
+  if [ -h $0 ]
+  then
+    cd `dirname $0`
+    CT_PATH=`basename $0`
+
+    while [ -h "$CT_PATH" ]
+    do
+      CT_PATH=`readlink $CT_PATH`
+      cd `dirname $CT_PATH`
+      CT_PATH=`basename $CT_PATH`
+    done
+    
+    CT_PATH=`cd .. && pwd -P`
+  else
+    CT_PATH=`dirname $0`/..
+    CT_PATH=`cd $CT_PATH && pwd -P`
+  fi
+fi
+
+LOG_VERBOSE=true
+LOG_COLOR=true
+LOG_HILITE_STRINGS="$LOG_HILITE_STRINGS load"
+
+MODULES_ROOT=$CT_PATH/bin/functions
+
+for dep in $MODULES_ROOT/core/*; do . $dep; done
+
+module_depends doc run update install uninstall version
+
+module_annotate_block help usage <<-USAGE
+Runs the Cascading.Load jar with the provided parameters.
+
+Usage:
+  `basename $0` [flags] action [action-flags]
+  `basename $0` [flags] command=argument [command=argument [...]]
+  `basename $0` help [action]
+
+Flags:
+  -h|--help      - displays this message
+  -q|--quiet     - silences INFO messages
+  -nc|--no-color - disables colorization of messages
+
+Commands:
+  See \`help doc\` for more information.
+
+Actions:
+USAGE
+
+module_annotate_block help banner <<-USAGE
+`basename $0` is a wrapper around Cascading.Load.
+Copyright (c) `date +%Y` Concurrent, Inc. (http://concurrentinc.com)
+USAGE
+
+multitool_run ()
+{
+  while [ $# -gt 0 ]
+  do
+    case "$1" in
+      -q|--quiet)
+        unset LOG_VERBOSE
+        ;;
+      -nc|--no-color|--no-colour)
+        unset LOG_COLOR
+        ;;
+      *)
+        extracted_opts="$extracted_opts$1 "
+        ;;
+    esac
+    shift
+  done
+  
+  route_perform $extracted_opts
+}
+
+multitool_run $@

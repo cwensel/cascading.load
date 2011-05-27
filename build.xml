@@ -105,8 +105,18 @@
 
   </target>
 
+  <!-- runs roundup.sh test plans -->
+  <target name="sh-test" description="run the shell unit test plans">
+    <exec executable="/bin/sh" failonerror="true">
+      <arg value="${src.test}/sh/helper/roundup.sh"/>
+      <arg value="${src.test}/sh/core/*_test.sh"/>
+      <arg value="${src.test}/sh/cascading/*_test.sh"/>
+      <arg value="${src.test}/sh/*_test.sh"/>
+    </exec>
+  </target>
+
   <!-- runs JUnit tests -->
-  <target name="test" depends="compile,compile-test" description="run the unit tests">
+  <target name="test" depends="compile,compile-test,sh-test" description="run the unit tests">
     <echo message="running all tests..."/>
 
     <mkdir dir="build/test/log"/>
