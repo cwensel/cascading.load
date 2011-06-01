@@ -1,43 +1,35 @@
 <!--
-  ~ Copyright (c) 2010 Concurrent, Inc. All Rights Reserved.
+  ~ Copyright (c) 2011 Concurrent, Inc. All Rights Reserved.
   ~
   ~ Project and contact information: http://www.concurrentinc.com/
   -->
 
 <ivy-module version="2.0">
-
-  <info organisation="cascading" module="cascading-load" revision="">
-
-    <license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
-
+  <info organisation="cascading" module="cascading-load"  revision="${cascading.release.full}">
+    <license name="GNU General Public License version 3" url="http://www.gnu.org/licenses/"/>
     <ivyauthor name="Concurrent, Inc." url="http://concurrentinc.com/"/>
-
-    <description homepage="http://github.com/cwensel/cascading.load">
+    <description homepage="http://cascading.org">
     </description>
   </info>
 
   <configurations>
-    <conf name="compile"/>
-    <conf name="runtime"/>
+    <conf name="default"/>
     <conf name="test"/>
   </configurations>
 
   <dependencies>
+    <dependency org="cascading" name="cascading-core" rev="1.2.3" conf="default"/>
+    <dependency org="cascading" name="cascading-test" rev="1.2.3" conf="test->default"/>
+    <dependency org="args4j" name="args4j" rev="2.0.12" conf="default"/>
 
-    <dependency org="cascading" name="cascading-core" rev="1.2.3" conf="compile->master,compile"
-                changing="true"/>
-    <dependency org="args4j" name="args4j" rev="2.0.12" conf="compile->default"/>
-
-    <dependency org="org.apache.hadoop" name="hadoop-core" rev="0.20.2" conf="runtime->default">
+    <dependency org="org.apache.hadoop" name="hadoop-core" rev="0.20.2" conf="test->default">
       <exclude org="ant"/>
     </dependency>
-    <dependency org="org.apache.hadoop" name="hadoop-test" rev="0.20.2" conf="runtime->default"/>
-    <dependency org="log4j" name="log4j" rev="1.2.15" conf="runtime->master"/>
+    <dependency org="org.apache.hadoop" name="hadoop-test" rev="0.20.2" conf="test->default"/>
 
-    <dependency org="cascading" name="cascading-test" rev="1.2.3" conf="test->master,compile"
-                changing="true"/>
+    <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.4.3" conf="test->default">
+    </dependency>
 
+    <dependency org="junit" name="junit" rev="4.4" conf="test->default"/>
   </dependencies>
-
 </ivy-module>
-
