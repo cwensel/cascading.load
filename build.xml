@@ -21,7 +21,7 @@
   ~ along with Cascading.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<project name="load" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="cascading.load" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <dirname property="load.basedir" file="${ant.file.load}"/>
 
@@ -239,10 +239,10 @@
   <target name="retrieve">
     <ivy:settings id="ivy.conjars.settings" url="http://conjars.org/repo/ivysettings.xml"/>
 
-    <ivy:retrieve file="${multitool.basedir}/ivy.xml" settingsRef="ivy.conjars.settings" conf="default"
+    <ivy:retrieve file="${load.basedir}/ivy.xml" settingsRef="ivy.conjars.settings" conf="default"
                   pattern="${lib.dir}/[artifact]-[revision].[ext]" sync="true"/>
 
-    <ivy:retrieve file="${multitool.basedir}/ivy.xml" settingsRef="ivy.conjars.settings" conf="test"
+    <ivy:retrieve file="${load.basedir}/ivy.xml" settingsRef="ivy.conjars.settings" conf="test"
                   pattern="${build.dir}/deps/[artifact]-[revision].[ext]" sync="true"/>
   </target>
 </project>

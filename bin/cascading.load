@@ -56,7 +56,7 @@ module_annotate_block help banner <<-USAGE
 Copyright (c) `date +%Y` Concurrent, Inc. (http://concurrentinc.com)
 USAGE
 
-multitool_run ()
+cascading_load_run ()
 {
   while [ $# -gt 0 ]
   do
@@ -77,4 +77,4 @@ multitool_run ()
   route_perform $extracted_opts
 }
 
-multitool_run $@
+cascading_load_run $@
