@@ -32,6 +32,7 @@
   <property name="src.license" location="${load.basedir}/LICENSE.txt"/>
 
   <property name="src.dir" location="${load.basedir}/src/java"/>
+  <property name="src.resource" location="${load.basedir}/src/resource"/>
   <property name="src.test" location="${load.basedir}/src/test"/>
 
   <available file="${src.dir}" type="dir" property="main.available"/>
@@ -81,6 +82,9 @@
 
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
+        <exclude name="**/*.java"/>
+      </fileset>
+      <fileset dir="${src.resource}">
         <exclude name="**/*.java"/>
       </fileset>
     </copy>
