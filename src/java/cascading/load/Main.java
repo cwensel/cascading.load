@@ -6,7 +6,10 @@
 
 package cascading.load;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -188,7 +191,8 @@ public class Main
       }
     catch( CmdLineException exception )
       {
-      System.err.println( exception.getMessage() );
+      System.out.print( "error: " );
+      System.out.println( exception.getMessage() );
       printUsageAndExit( parser );
       }
 
@@ -199,19 +203,85 @@ public class Main
     return options;
     }
 
+  private static void printCascadingVersion()
+    {
+    try
+      {
+      Properties versionProperties = new Properties();
+
+      InputStream stream = Cascade.class.getClassLoader().getResourceAsStream( "cascading/version.properties" );
+      versionProperties.load( stream );
+
+      stream = Cascade.class.getClassLoader().getResourceAsStream( "cascading/build.number.properties" );
+      if( stream != null )
+        versionProperties.load( stream );
+
+      String releaseMajor = versionProperties.getProperty( "cascading.release.major" );
+      String releaseMinor = versionProperties.getProperty( "cascading.release.minor", null );
+      String releaseBuild = versionProperties.getProperty( "build.number", null );
+      String releaseFull = null;
+
+      if( releaseMinor == null )
+        releaseFull = releaseMajor;
+      else if( releaseBuild == null )
+        releaseFull = String.format( "%s.%s", releaseMajor, releaseMinor );
+      else
+        releaseFull = String.format( "%s.%s%s", releaseMajor, releaseMinor, releaseBuild );
+
+
+      System.out.println( String.format( "Using Cascading %s", releaseFull ) );
+      }
+    catch( IOException exception )
+      {
+      System.out.println( "Unknown Cascading Version" );
+      }
+    }
+
+  private static void printLicense()
+    {
+    try
+      {
+      InputStream stream = Main.class.getResourceAsStream( "/LOAD-LICENSE.txt" );
+      BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
+
+      System.out.print( "This release is licensed under the " );
+
+      String line = reader.readLine();
+
+      while( line != null )
+        {
+        if( line.matches( "^Binary License:.*$" ) )
+          {
+          System.out.println( line.substring( 15 ).trim() );
+          break;
+          }
+
+        line = reader.readLine();
+        }
+
+      reader.close();
+      }
+    catch( IOException exception )
+      {
+      System.out.println( "Unspecified License" );
+      }
+    }
+
   protected static void printUsageAndExit( CmdLineParser parser )
     {
-    System.err.println( String.format( "hadoop %s [options...]", Main.class.getName() ) );
+    System.out.println( "cascading.load [options...]" );
 
-    System.err.println( "" );
+    printLicense();
+    printCascadingVersion();
 
 //    System.err.println( "Optional:" );
 //    System.err.println( String.format( " env vars: %s, %s", AWS.AWS_ACCESS_KEY_ENV, AWS.AWS_SECRET_KEY_ENV ) );
 
-    System.err.println( "Options:" );
-    parser.printUsage( System.err );
+    System.out.println( "" );
+    System.out.println( "Usage:" );
+    parser.printUsage( System.out );
 
-    System.exit( -1 );
+    System.exit( 1 );
     }
 
   }
