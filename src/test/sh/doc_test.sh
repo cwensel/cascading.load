@@ -12,5 +12,5 @@ before () {
 
 it_prints_an_about_message () {
   about=`module_annotate doc about`
-  test "$about" = "describes a Cascading.Load command"
+  test "$about" = "describes the Cascading.Load arguments"
 }
