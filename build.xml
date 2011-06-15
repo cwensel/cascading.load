@@ -215,7 +215,7 @@
 
     <property file="${package.aws.properties}"/>
 
-    <echo message="http://${package.remote.bucket}/load/${ant.project.name}-${DSTAMP}.tgz"
+    <echo message="http://${package.remote.bucket}/cascading.load/${ant.project.name}-${DSTAMP}.tgz"
           file="${ant.project.name}-current.txt"/>
 
     <S3Upload verbose="true"
