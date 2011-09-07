@@ -20,6 +20,7 @@ public class Options
   {
   private static final Logger LOG = Logger.getLogger( Options.class );
 
+  boolean singlelineStats = false;
   boolean debugLogging = false;
   int blockSizeMB = 64;
   int numDefaultMappers = -1;
@@ -37,6 +38,8 @@ public class Options
   String outputRoot;
   String workingRoot = "working_" + System.currentTimeMillis() + "_" + (int) Math.random() * 1000;
   String statsRoot;
+
+  boolean cleanWorkFiles = false;
 
   boolean runAllLoads = false;
 
@@ -56,6 +59,16 @@ public class Options
   boolean pipeline;
   int hashModulo = -1;
 
+  public boolean isSinglelineStats()
+    {
+    return singlelineStats;
+    }
+
+  @Option(name = "-SLS", usage = "single-line stats", required = false)
+  public void setSinglelineStats( boolean singlelineStats )
+    {
+    this.singlelineStats = singlelineStats;
+    }
 
   public boolean isDebugLogging()
     {
@@ -240,6 +253,17 @@ public class Options
     this.statsRoot = statsRoot;
     }
 
+  public boolean isCleanWorkFiles()
+    {
+    return cleanWorkFiles;
+    }
+
+  @Option(name = "-CWF", usage = "clean work files", required = false)
+  public void setCleanWorkFiles( boolean cleanWorkFiles )
+    {
+    this.cleanWorkFiles = cleanWorkFiles;
+    }
+
   private String makePathDir( String path )
     {
     if( path == null || path.isEmpty() )
@@ -261,6 +285,7 @@ public class Options
     {
     this.runAllLoads = runAllLoads;
     }
+
 //////////////////////////////////
 
   public boolean isDataGenerate()
@@ -451,7 +476,8 @@ public class Options
     {
     final StringBuilder sb = new StringBuilder();
     sb.append( "Options" );
-    sb.append( "{debugLogging=" ).append( debugLogging );
+    sb.append( "{singlelineStats=" ).append( singlelineStats );
+    sb.append( ", debugLogging=" ).append( debugLogging );
     sb.append( ", blockSizeMB=" ).append( blockSizeMB );
     sb.append( ", numDefaultMappers=" ).append( numDefaultMappers );
     sb.append( ", numDefaultReducers=" ).append( numDefaultReducers );

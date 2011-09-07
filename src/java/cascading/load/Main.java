@@ -36,9 +36,12 @@ import cascading.tap.SinkMode;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+//import sun.management.FileSystem; //conflicts w/ hadoop & unused anyway
 
 /**
  *
@@ -94,7 +97,36 @@ public class Main
 
     printSummary( stats );
 
+    if( options.isCleanWorkFiles() )
+      cleanWorkFiles();
+
     return true;
+    }
+
+  private void cleanWorkFiles()
+    {
+    // - Ask each phase to delete work files:
+    //   - Save every work sink Tap & then tap.deletePath( new JobConf() )
+    //   - Save list of all Load instances.
+    //   - Add method that stores sink Taps to Load baseclass - noteSinkTap say.
+    //   noteSinkTap will save the ref when a saving flag is set. value of
+    //   this flag set via options.isCleanWorkFiles() when Load instance
+    //   created: also have set/get? have noteSinkTap w/ bool param?
+    //   - Each Load instance calls noteSinkTap accordingly
+    //   - Add method deleteSinkTaps to Load.
+
+    try
+      {
+      LOG.info( "cleaning work files" );
+      FileSystem fs = FileSystem.get( new JobConf() );
+      fs.delete( new Path( options.getInputRoot() ), true );
+      fs.delete( new Path( options.getWorkingRoot() ), true );
+      fs.delete( new Path( options.getOutputRoot() ), true );
+      }
+    catch( Exception exception )
+      {
+       LOG.error( "failed cleaning work files ", exception );
+      }
     }
 
   private void printSummary( CascadeStats stats ) throws IOException
@@ -106,7 +138,7 @@ public class Main
 
     writer.println( options );
 
-    StatsPrinter.printCascadeStats( writer, stats );
+    StatsPrinter.printCascadeStats( writer, stats, options.isSinglelineStats() );
 
     if( options.hasStatsRoot() )
       {
