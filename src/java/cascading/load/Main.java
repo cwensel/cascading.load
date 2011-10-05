@@ -22,6 +22,7 @@ import cascading.cascade.CascadeConnector;
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
 import cascading.load.common.CascadeLoadPlatform;
+import cascading.flow.hadoop.HadoopFlowProcess;
 import cascading.load.countsort.CountSort;
 import cascading.load.countsort.StaggeredSort;
 import cascading.load.countsort.FullTupleGroup;
@@ -37,7 +38,6 @@ import cascading.load.pipeline.ChainedAggregate;
 import cascading.load.util.StatsPrinter;
 import cascading.load.util.Util;
 import cascading.operation.DebugLevel;
-import cascading.pipe.cogroup.CoGroupClosure;
 import cascading.stats.CascadeStats;
 import cascading.tap.Tap;
 import cascading.tap.SinkMode;
@@ -206,7 +206,7 @@ public class Main
     else
       FlowConnector.setDebugLevel( properties, DebugLevel.NONE );
 
-    properties.setProperty( CoGroupClosure.SPILL_THRESHOLD, Integer.toString( options.getTupleSpillThreshold() ) );
+    properties.setProperty( HadoopFlowProcess.SPILL_THRESHOLD, Integer.toString( options.getTupleSpillThreshold() ) );
 
 //    properties.setProperty( "mapred.output.compress", "true" );
     properties.setProperty( "mapred.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );

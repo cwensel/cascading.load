@@ -27,12 +27,13 @@ import java.util.Map;
 import cascading.flow.FlowConnector;
 import cascading.load.Options;
 import cascading.scheme.Scheme;
-import cascading.scheme.TextLine;
-import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
 import cascading.tuple.TupleEntryCollector;
+import cascading.flow.hadoop.HadoopFlowProcess;
+import cascading.tap.hadoop.Hfs;
+import cascading.flow.hadoop.HadoopFlowConnector;
 
 import org.apache.hadoop.mapred.JobConf;
 
@@ -69,37 +70,37 @@ public abstract class CascadeLoadPlatform
     @Override
     public TupleEntryCollector newTupleEntryCollector( Tap tap ) throws IOException
       {
-      return tap.openForWrite( new JobConf() );
+      return tap.openForWrite( new HadoopFlowProcess() );
       }
 
     @Override
     public Scheme newTextLine()
       {
-      return new TextLine();
+      return new cascading.scheme.hadoop.TextLine();
       }
 
     @Override
     public Scheme newTextLine( Fields sourceFields )
       {
-      return new TextLine( sourceFields );
+      return new cascading.scheme.hadoop.TextLine( sourceFields );
       }
 
     @Override
     public Scheme newTextLine( Fields sourceFields, Fields sinkFields )
       {
-      return new TextLine( sourceFields, sinkFields );
+      return new cascading.scheme.hadoop.TextLine( sourceFields, sinkFields );
       }
 
     @Override
     public FlowConnector newFlowConnector()
       {
-      return new FlowConnector();
+      return new HadoopFlowConnector();
       }
 
     @Override
     public FlowConnector newFlowConnector( Map<Object,Object> properties )
       {
-      return new FlowConnector( properties );
+      return new HadoopFlowConnector( properties );
       }
     }
 

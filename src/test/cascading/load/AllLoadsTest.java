@@ -25,7 +25,7 @@ public class AllLoadsTest extends LoadTestCase
 
   public AllLoadsTest()
     {
-    super( "generate data tests" );
+    super();
     }
 
   public void testAllLoads() throws Exception

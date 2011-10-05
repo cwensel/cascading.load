@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Concurrent, Inc. All Rights Reserved.
+ * Copyright (c) 2007-2011 Concurrent, Inc. All Rights Reserved.
  *
  * Project and contact information: http://www.concurrentinc.com/
  */
@@ -20,6 +20,7 @@ import cascading.pipe.Each;
 import cascading.pipe.Pipe;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
+import cascading.flow.hadoop.HadoopFlowProcess;
 import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
@@ -75,7 +76,7 @@ public class GenerateData extends Load
 
     Tuple output = new Tuple();
 
-    output.addAll( (Object[]) dictionary.toArray( new String[dictionary.size()] ) );
+    output.addAll( (Object[]) dictionary.toArray( new String[ dictionary.size() ] ) );
 
     String workingPath = options.getWorkingRoot() + "dictionary/";
     Tap tap = platform.newTap( platform.newTextLine(), workingPath );
@@ -85,7 +86,7 @@ public class GenerateData extends Load
       {
       jobConf.setInt( "mapred.task.partition", i );
 
-      TupleEntryCollector writer = tap.openForWrite( jobConf );
+      TupleEntryCollector writer = tap.openForWrite( new HadoopFlowProcess( jobConf ) );
 
       writer.add( output );
 

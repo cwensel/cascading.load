@@ -1,5 +1,7 @@
 junitvm*.properties
 build.properties
+.gradle
+gradle.properties
 .DS_Store
 lib
 build

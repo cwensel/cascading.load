@@ -56,16 +56,16 @@ Using
 
 Building
 
- This release requires at least Cascading 1.2.x and will pull all dependencies from
+ This release uses Cascading 2.0 and will pull all dependencies from
  the relevant maven repos, including conjars.org.
 
  To build a jar,
 
- > ant retrieve jar
+ > gradle jar
 
  To test,
 
- > ant test
+ > gradle test
 
 License
 

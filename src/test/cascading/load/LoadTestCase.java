@@ -8,16 +8,16 @@ package cascading.load;
 
 import java.util.Properties;
 
-import cascading.ClusterTestCase;
+import cascading.PlatformTestCase;
 
 /**
  *
  */
-public class LoadTestCase extends ClusterTestCase
+public class LoadTestCase extends PlatformTestCase
   {
-  public LoadTestCase( String string )
+  public LoadTestCase()
     {
-    super( string );
+    super();
     }
 
   public Properties getProperties()

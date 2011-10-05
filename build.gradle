@@ -1,0 +1,169 @@
+/*
+ * Copyright (c) 2007-2011 Concurrent, Inc. All Rights Reserved.
+ *
+ * Project and contact information: http://www.concurrentinc.com/
+ */
+
+import java.text.SimpleDateFormat
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+project.archivesBaseName = 'load'
+
+if( project.properties[ 'teamcity' ] ) // make them system properties
+System.properties.putAll(project.properties[ 'teamcity' ])
+
+if( System.properties[ 'aws.properties' ] )
+{
+  file(System.properties[ 'aws.properties' ]).withReader { reader ->
+    def awsProperties = new Properties()
+    awsProperties.load(reader)
+    System.properties.putAll(awsProperties)
+  }
+}
+
+timestamp = new SimpleDateFormat("yyyyMMdd").format(new Date())
+
+configurations {
+  sshAntTask
+  s3AntTask
+}
+
+dependencies {
+  sshAntTask 'org.apache.ant:ant-jsch:1.7.1', 'jsch:jsch:0.1.29'
+  s3AntTask 'thirdparty:awstasks:0.3'
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  mavenRepo name: 'conjars', urls: 'http://conjars.org/repo/'
+  mavenRepo name: 'apache', urls: 'https://repository.apache.org/content/repositories/releases/'
+}
+
+dependencies {
+  compile('cascading:cascading-core:2.0.0-wip-+') { exclude group: 'log4j' }
+  compile('cascading:cascading-hadoop:2.0.0-wip-+') { transitive = false }
+  compile('org.apache.hadoop:hadoop-core:0.20.2') { exclude group: 'ant' }
+  compile('args4j:args4j:2.0.12')
+  compile('log4j:log4j:1.2.16')
+
+  testCompile('cascading:cascading-test:2.0.0-wip-+')
+  testCompile('org.apache.hadoop:hadoop-test:0.20.2')
+}
+
+sourceSets {
+  main {
+    java.srcDir 'src/java'
+    resources.srcDir 'src/resources'
+  }
+
+  test {
+    java.srcDir 'src/test'
+  }
+}
+
+test {
+  exclude '**/*TestCase*'
+}
+
+jar {
+  description = "Assembles a Hadoop ready jar file"
+  version = timestamp
+
+  doFirst {
+
+    def set = new HashSet()
+
+    def deps = configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.findAll { dep ->
+      !dep.name.startsWith('org.apache.hadoop') && !dep.name.startsWith('log4j')
+    }.collect { dep ->
+      dep.allModuleArtifacts.collect {
+        it.file
+      }
+    }
+
+    deps.each { col -> set.addAll(col)}
+
+    into('lib') {
+      from(set)
+    }
+  }
+
+  manifest {
+    attributes("Main-Class": "cascading/load/Main")
+    attributes("Build-Date": "${timestamp}")
+  }
+}
+
+task distCopy(type: Copy, dependsOn: jar) {
+
+  into "${buildDir}/dist/${archivesBaseName}"
+
+  from 'README.TXT'
+  from 'build.gradle'
+  from('src') {into 'src'}
+
+  from "$buildDir/libs"
+}
+
+task dist(type: Tar, dependsOn: distCopy) {
+
+  compression = "GZIP"
+  version = timestamp
+
+  from "${buildDir}/dist/"
+}
+
+task s3Upload(dependsOn: dist) {
+
+  awsAccessId = System.properties[ 'publish.aws.accessId' ]
+  awsSecretKey = System.properties[ 'publish.aws.secretKey' ]
+  s3Bucket = System.properties[ 'publish.bucket' ]
+
+  remotePath = 'load/2.0/'
+}
+
+s3Upload << {
+
+  def latestPath = new File(buildDir, 'latest.txt')
+
+  latestPath.write("http://${s3Bucket}/${remotePath}${jar.archivePath.name}")
+
+  ant.taskdef(name: 's3Upload', classname: 'dak.ant.taskdefs.S3Upload',
+          classpath: configurations.s3AntTask.asPath)
+
+  ant.s3Upload(verbose: 'true', accessId: awsAccessId, secretKey: awsSecretKey,
+          bucket: s3Bucket, prefix: remotePath, publicRead: 'true') {
+    fileset(file: dist.archivePath)
+    fileset(file: jar.archivePath)
+    fileset(file: latestPath)
+  }
+
+  latestPath.delete()
+}
+
+task sitePublish(dependsOn: s3Upload) << {
+
+  def publishBucket = System.properties[ 'publish.bucket' ]
+  def publishDownloadPath = System.properties[ 'publish.download.path' ]
+  def publishPort = !System.properties[ 'publish.port' ] ? '22' : System.properties[ 'publish.port' ]
+  def publishKeyFile = System.properties[ 'publish.keyfile' ]
+
+  def releaseTar = dist.archivePath.name
+
+  def currentPath = new File(buildDir, 'load-current.txt')
+
+  currentPath.write("http://${publishBucket}/load/2.0/${releaseTar}")
+
+  ant.taskdef(name: 'scp', classname: 'org.apache.tools.ant.taskdefs.optional.ssh.Scp',
+          classpath: configurations.sshAntTask.asPath)
+
+  def remoteToFile = "${publishDownloadPath}/load/2.0/${releaseTar}"
+
+  ant.scp(file: currentPath, remoteToFile: remoteToFile,
+          keyfile: publishKeyFile, passphrase: '', port: publishPort, trust: 'true')
+
+  currentPath.delete()
+}

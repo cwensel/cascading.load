@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Concurrent, Inc. All Rights Reserved.
+ * Copyright (c) 2007-2011 Concurrent, Inc. All Rights Reserved.
  *
  * Project and contact information: http://www.concurrentinc.com/
  */
@@ -86,11 +86,11 @@ public class StatsPrinter
       childCount = cascadingStats.getChildren().size();
 
     writer.printf( "%s\t%s\t%s\t%d\t%d\t%d\t%d%n",
-                   type,
-                   overrideName == null ? cascadingStats.getName() : overrideName,
-                   cascadingStats.getStatus(),
-                   cascadingStats.getStartTime(), cascadingStats.getFinishedTime(),
-                   cascadingStats.getDuration(), childCount );
+      type,
+      overrideName == null ? cascadingStats.getName() : overrideName,
+      cascadingStats.getStatus(),
+      cascadingStats.getStartTime(), cascadingStats.getFinishedTime(),
+      cascadingStats.getDuration(), childCount );
 
     writer.flush();
     }
