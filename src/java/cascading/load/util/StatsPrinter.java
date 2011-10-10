@@ -8,14 +8,13 @@ package cascading.load.util;
 
 import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cascading.stats.CascadeStats;
 import cascading.stats.CascadingStats;
 import cascading.stats.FlowStats;
 import cascading.stats.StepStats;
-import com.sun.tools.corba.se.idl.StringGen;
 
 /**
  *
