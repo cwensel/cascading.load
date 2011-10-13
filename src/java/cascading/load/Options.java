@@ -33,6 +33,7 @@ public class Options
   List<String> hadoopProperties = new ArrayList<String>();
   int numMappersPerBlock = 1; // multiplier for num mappers, needs 1.2 wip for this
   int numReducersPerMapper = -1;
+  String childVMOptions = "-Xmx1000m -XX:+UseParallelOldGC";
 
   String inputRoot;
   String outputRoot;
@@ -262,6 +263,17 @@ public class Options
   public void setCleanWorkFiles( boolean cleanWorkFiles )
     {
     this.cleanWorkFiles = cleanWorkFiles;
+    }
+
+  public String getChildVMOptions()
+    {
+    return childVMOptions;
+    }
+
+  @Option(name = "-CVMO", usage = "child JVM options", required = false)
+  public void setChildVMOptions( String childVMOptions )
+    {
+    this.childVMOptions = childVMOptions;
     }
 
   private String makePathDir( String path )

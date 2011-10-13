@@ -177,7 +177,7 @@ public class Main
     properties.setProperty( "mapred.compress.map.output", "true" );
 
     // -XX:+UseParallelOldGC -XX:ParallelGCThreads=1
-    properties.setProperty( "mapred.child.java.opts", "-server -Xmx1000m -XX:+UseParallelOldGC" );
+    properties.setProperty( "mapred.child.java.opts", "-server " + options.getChildVMOptions() );
 
     if( options.getNumDefaultMappers() != -1 )
       properties.setProperty( "mapred.map.tasks", Integer.toString( options.getNumDefaultMappers() ) );
