@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Concurrent, Inc. All Rights Reserved.
+ * Copyright (c) 2007-2011 Concurrent, Inc. All Rights Reserved.
  *
  * Project and contact information: http://www.concurrentinc.com/
  */
@@ -8,9 +8,9 @@ package cascading.load;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -35,9 +35,9 @@ import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.log4j.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -80,7 +80,7 @@ public class Main
     if( options.isPipeline() )
       flows.add( new Pipeline( options, getDefaultProperties() ).createFlow() );
 
-    Cascade cascade = new CascadeConnector( getDefaultProperties() ).connect( flows.toArray( new Flow[0] ) );
+    Cascade cascade = new CascadeConnector( getDefaultProperties() ).connect( flows.toArray( new Flow[ 0 ] ) );
 
     CascadeStats stats = cascade.getCascadeStats();
 
@@ -125,7 +125,7 @@ public class Main
       }
     catch( Exception exception )
       {
-       LOG.error( "failed cleaning work files ", exception );
+      LOG.error( "failed cleaning work files ", exception );
       }
     }
 
@@ -293,7 +293,7 @@ public class Main
 
       reader.close();
       }
-    catch( IOException exception )
+    catch( Exception exception )
       {
       System.out.println( "Unspecified License" );
       }
