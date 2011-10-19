@@ -158,8 +158,7 @@ public class AllLoadsTest extends LoadTestCase
 
       //TODO own test
       //,"-gwm", "0"
-      ,"-gws", "1"
-      //,"-gwn", "5"
+      ,"-gws", "0.2"
     };
 
     assertTrue( new Main( args ).execute() );

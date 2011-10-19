@@ -19,6 +19,9 @@ import org.kohsuke.args4j.Option;
 public class Options
   {
   private static final Logger LOG = Logger.getLogger( Options.class );
+  public static final float MIN_DATA_STDDEV = Float.MIN_VALUE;
+  public static final float DEF_DATA_STDDEV = 0.2f;
+  public static final float MAX_DATA_STDDEV = 0.9999f;
 
   boolean singlelineStats = false;
   boolean debugLogging = false;
@@ -37,7 +40,7 @@ public class Options
 
   String inputRoot;
   String outputRoot;
-  String workingRoot = "working_" + System.currentTimeMillis() + "_" + (int) Math.random() * 1000;
+  String workingRoot = "working_" + System.currentTimeMillis() + "_" + (int) (Math.random() * 1000);
   String statsRoot;
 
   boolean cleanWorkFiles = false;
@@ -54,7 +57,6 @@ public class Options
   int fillFilesPerAvailMapper = -1;
   float dataMeanWords = -1;
   float dataStddevWords = -1;
-  int dataNSigmaWords = -1;
 
   boolean countSort;
 
@@ -395,17 +397,19 @@ public class Options
   //TODO --generate-words-normal [<mean>][,<stddev>][,<nsigma>]
   //Note that ',' is a potential decimal-point
 
-  //TODO ramge validation
-
   public float getDataMeanWords()
     {
     return dataMeanWords;
     }
 
   @Option(name = "-gwm", aliases = {
-    "--generate-words-mean"}, usage = "mean of a normal distribution from dictionary", required = false)
+    "--generate-words-mean"}, usage = "mean modifier [0,1] of a normal distribution from dictionary", required = false)
   public void setDataMeanWords( float dataMeanWords )
     {
+    if( dataMeanWords < 0 )
+      dataMeanWords = 0;
+    else if( dataMeanWords > 1 )
+      dataMeanWords = 1;
     this.dataMeanWords = dataMeanWords;
     }
 
@@ -415,32 +419,24 @@ public class Options
     }
 
   @Option(name = "-gws", aliases = {
-    "--generate-words-stddev"}, usage = "standard-deviation of a normal distribution from dictionary", required = false)
+    "--generate-words-stddev"}, usage = "standard-deviation modifier (0,1) of a normal distribution from dictionary", required = false)
   public void setDataStddevWords( float dataStddevWords )
     {
+    if( dataStddevWords < MIN_DATA_STDDEV )
+      dataStddevWords = MIN_DATA_STDDEV;
+    else if( dataStddevWords > MAX_DATA_STDDEV )
+      dataStddevWords = MAX_DATA_STDDEV;
     this.dataStddevWords = dataStddevWords;
-    }
-
-  public int getDataNSigmaWords()
-    {
-    return dataNSigmaWords;
-    }
-
-  @Option(name = "-gwn", aliases = {
-    "--generate-words-nsigma"}, usage = "number of stddev in tail of a normal distribution from dictionary", required = false)
-  public void setDataNSigmaWords( int dataNSigmaWords )
-    {
-    this.dataNSigmaWords = dataNSigmaWords;
     }
 
   public boolean useNormalDistribution()
     {
-    return dataMeanWords != -1 || dataStddevWords != -1 || dataNSigmaWords != -1;
+    return dataMeanWords != -1 || dataStddevWords != -1;
     }
 
   public String getDataNormalDesc()
     {
-    return "normal(" + getDataMeanWords() + "," + getDataStddevWords() + "," + getDataNSigmaWords() + ")";
+    return "normal(" + getDataMeanWords() + "," + getDataStddevWords() + ")";
     }
 
   ////////////////////////////////////////

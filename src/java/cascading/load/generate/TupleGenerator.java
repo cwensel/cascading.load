@@ -27,7 +27,6 @@ class TupleGenerator extends BaseOperation implements Function
   String dataWordDelimiter = " "; // space
   float dataMeanWords = -1;
   float dataStddevWords = -1;
-  int dataNSigmaWords = -1;
 
   //TODO should be toplevel classes; use distribution lib?
 
@@ -42,6 +41,7 @@ class TupleGenerator extends BaseOperation implements Function
       this.random = new Random( System.currentTimeMillis() );
       }
 
+    // Next integer in 0..max from distribution.
     abstract int next();
     }
 
@@ -62,33 +62,34 @@ class TupleGenerator extends BaseOperation implements Function
     {
     protected float mean;
     protected float stddev;
+    protected int last;
 
     NormIntDist( int max )
       {
       super( max );
-      int halfMax = max / 2;
-      int nsigma = dataNSigmaWords == -1 ? 5 : dataNSigmaWords;
-      mean = dataMeanWords == -1 ? halfMax : dataMeanWords * halfMax + halfMax;
-      stddev = dataStddevWords == -1 ? halfMax / nsigma : dataStddevWords * (halfMax / nsigma);
+      int halfMax = this.max / 2;
+      mean = (dataMeanWords == -1 ? halfMax : dataMeanWords * halfMax + halfMax) - 1;
+      stddev = dataStddevWords == -1 ? Options.DEF_DATA_STDDEV * halfMax : dataStddevWords * halfMax;
+      this.last = this.max - 1;
       }
 
     int next()
       {
-      // Get the next integer in a normal distribution but make sure it doesn't
-      // over/underflow the range.
-      int res;
-      do
-        {
-        // Truncate is good enough
-        res = (int) (mean + stddev * random.nextGaussian());
-        } while( res < 0 || res >= max );
+      // Using a "clamp" method, "rejection", or "modulo" results in a similar stddev,
+      // at least for a large (100k) sample size.
+      int res = (int) Math.round( mean + stddev * random.nextGaussian() );
+      if( res < 0 )
+        res = 0;
+      else if( res > last )
+        res = last;
       return res;
       }
     }
 
+  // Inner class cannot have static method, otherwise would be member of IntDist.
   private IntDist getIntDist( int max )
     {
-    if( dataMeanWords != -1 || dataStddevWords != -1 || dataNSigmaWords != -1 )
+    if( dataMeanWords != -1 || dataStddevWords != -1 )
       return this.new NormIntDist( max );
     else
       return this.new UniIntDist( max );
@@ -104,7 +105,6 @@ class TupleGenerator extends BaseOperation implements Function
     dataWordDelimiter = options.getDataWordDelimiter();
     dataMeanWords = options.getDataMeanWords();
     dataStddevWords = options.getDataStddevWords();
-    dataNSigmaWords = options.getDataNSigmaWords();
 
     if( dataMaxWords < dataMinWords )
       throw new IllegalArgumentException( "max words must not be less than min words" );
