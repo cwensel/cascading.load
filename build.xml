@@ -236,9 +236,33 @@
          passphrase="" port="${package.remote.port}" trust="true"/>
 
     <delete file="${ant.project.name}-current.txt"/>
+
   </target>
 
-  <target name="publish" depends="clean,retrieve,test,tar,s3-package"/>
+  <target name="s3-jar" if="jar.remote.bucket">
+
+    <taskdef name="S3Upload" classname="dak.ant.taskdefs.S3Upload"/>
+
+    <property file="${package.aws.properties}"/>
+
+    <echo message="http://${jar.remote.bucket}/load/1.2/${ant.project.name}-${DSTAMP}.jar"
+          file="latest.txt"/>
+
+    <S3Upload verbose="true"
+              accessId="${package.aws.accessId}"
+              secretKey="${package.aws.secretKey}"
+              bucket="${jar.remote.bucket}"
+              prefix="load/1.2/"
+              publicRead="true">
+      <fileset file="build/${ant.project.name}-${DSTAMP}.jar"/>
+      <fileset file="latest.txt"/>
+    </S3Upload>
+
+    <delete file="latest.txt"/>
+
+	</target>
+
+  <target name="publish" depends="clean,retrieve,test,tar,s3-package,s3-jar"/>
 
   <target name="retrieve">
     <ivy:settings id="ivy.conjars.settings" url="http://conjars.org/repo/ivysettings.xml"/>
