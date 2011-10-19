@@ -106,40 +106,6 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 6, new File( output + "output" ).list().length );
     }
 
-  public void testSingleLineStatus() throws Exception
-    {
-    String output = this.output + "mainsls/";
-
-    String[] args = new String[]{
-      "-S", output + "status",
-      "-I", output + "input",
-      "-W", output + "working",
-      "-O", output + "output",
-
-      "-g",
-      "-gf", "1",
-      "-gs", "1",
-
-      "-c",
-
-      "-m",
-
-      "-p",
-
-      "-SLS"
-    };
-
-    assertTrue( new Main( args ).execute() );
-
-    FileReader fr = new FileReader( output + "status/part-00000" );
-    LineNumberReader ln = new LineNumberReader( fr );
-    int lineNo = ln.getLineNumber();
-    while( ln.readLine() != null )
-      lineNo = ln.getLineNumber();
-    ln.close();
-    assertEquals( 15, lineNo );
-    }
-
   public void testCleanWorkFiles() throws Exception
     {
     String output = this.output + "maincwf/";
@@ -166,6 +132,45 @@ public class AllLoadsTest extends LoadTestCase
     assertTrue( new Main( args ).execute() );
 
     assertEquals( 1, new File( output ).list().length );
+    }
+
+  public void testSingleLineStatus() throws Exception
+    {
+    String output = this.output + "mainsls/";
+
+    String[] args = new String[]{
+      "-S", output + "status",
+      "-I", output + "input",
+      "-W", output + "working",
+      "-O", output + "output",
+
+      "-g",
+      "-gf", "1",
+      "-gs", "1",
+
+      "-c",
+
+      "-m",
+
+      "-p",
+
+      "-SLS"
+
+      //TODO own test
+      //,"-gwm", "0"
+      ,"-gws", "1"
+      //,"-gwn", "5"
+    };
+
+    assertTrue( new Main( args ).execute() );
+
+    FileReader fr = new FileReader( output + "status/part-00000" );
+    LineNumberReader ln = new LineNumberReader( fr );
+    int lineNo = ln.getLineNumber();
+    while( ln.readLine() != null )
+      lineNo = ln.getLineNumber();
+    ln.close();
+    assertEquals( 15, lineNo );
     }
 
   }

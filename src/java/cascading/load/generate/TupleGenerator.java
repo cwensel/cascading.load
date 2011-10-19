@@ -25,6 +25,74 @@ class TupleGenerator extends BaseOperation implements Function
   int dataMaxWords = 10;
   int dataMinWords = 10;
   String dataWordDelimiter = " "; // space
+  float dataMeanWords = -1;
+  float dataStddevWords = -1;
+  int dataNSigmaWords = -1;
+
+  //TODO should be toplevel classes; use distribution lib?
+
+  private abstract class IntDist
+    {
+    protected Random random;
+    protected int max;
+
+    IntDist( int max )
+      {
+      this.max = max;
+      this.random = new Random( System.currentTimeMillis() );
+      }
+
+    abstract int next();
+    }
+
+  private class UniIntDist extends IntDist
+    {
+    UniIntDist( int max )
+      {
+      super( max );
+      }
+
+    int next()
+      {
+      return random.nextInt( max );
+      }
+    }
+
+  private class NormIntDist extends IntDist
+    {
+    protected float mean;
+    protected float stddev;
+
+    NormIntDist( int max )
+      {
+      super( max );
+      int halfMax = max / 2;
+      int nsigma = dataNSigmaWords == -1 ? 5 : dataNSigmaWords;
+      mean = dataMeanWords == -1 ? halfMax : dataMeanWords * halfMax + halfMax;
+      stddev = dataStddevWords == -1 ? halfMax / nsigma : dataStddevWords * (halfMax / nsigma);
+      }
+
+    int next()
+      {
+      // Get the next integer in a normal distribution but make sure it doesn't
+      // over/underflow the range.
+      int res;
+      do
+        {
+        // Truncate is good enough
+        res = (int) (mean + stddev * random.nextGaussian());
+        } while( res < 0 || res >= max );
+      return res;
+      }
+    }
+
+  private IntDist getIntDist( int max )
+    {
+    if( dataMeanWords != -1 || dataStddevWords != -1 || dataNSigmaWords != -1 )
+      return this.new NormIntDist( max );
+    else
+      return this.new UniIntDist( max );
+    }
 
   public TupleGenerator( Options options, Fields fieldDeclaration )
     {
@@ -34,6 +102,9 @@ class TupleGenerator extends BaseOperation implements Function
     dataMaxWords = options.getDataMaxWords();
     dataMinWords = options.getDataMinWords();
     dataWordDelimiter = options.getDataWordDelimiter();
+    dataMeanWords = options.getDataMeanWords();
+    dataStddevWords = options.getDataStddevWords();
+    dataNSigmaWords = options.getDataNSigmaWords();
 
     if( dataMaxWords < dataMinWords )
       throw new IllegalArgumentException( "max words must not be less than min words" );
@@ -45,6 +116,7 @@ class TupleGenerator extends BaseOperation implements Function
     Tuple dictionary = functionCall.getArguments().getTuple();
     Random random = new Random( System.currentTimeMillis() );
     long currentBytes = 0;
+    IntDist wordIndicies = getIntDist( dictionary.size() );
 
     Tuple words = new Tuple();
     Tuple output = new Tuple( "" );
@@ -56,7 +128,7 @@ class TupleGenerator extends BaseOperation implements Function
       words.clear();
 
       for( int i = 0; i < numWords; i++ )
-        words.add( dictionary.get( random.nextInt( dictionary.size() ) ) );
+        words.add( dictionary.get( wordIndicies.next() ) );
 
       String line = words.toString( dataWordDelimiter );
       currentBytes += line.getBytes().length;

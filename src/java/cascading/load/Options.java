@@ -52,6 +52,9 @@ public class Options
   String dataWordDelimiter = " "; // space
   int fillBlocksPerFile = -1;
   int fillFilesPerAvailMapper = -1;
+  float dataMeanWords = -1;
+  float dataStddevWords = -1;
+  int dataNSigmaWords = -1;
 
   boolean countSort;
 
@@ -389,6 +392,57 @@ public class Options
     this.fillFilesPerAvailMapper = fillFilesPerAvailMapper;
     }
 
+  //TODO --generate-words-normal [<mean>][,<stddev>][,<nsigma>]
+  //Note that ',' is a potential decimal-point
+
+  //TODO ramge validation
+
+  public float getDataMeanWords()
+    {
+    return dataMeanWords;
+    }
+
+  @Option(name = "-gwm", aliases = {
+    "--generate-words-mean"}, usage = "mean of a normal distribution from dictionary", required = false)
+  public void setDataMeanWords( float dataMeanWords )
+    {
+    this.dataMeanWords = dataMeanWords;
+    }
+
+  public float getDataStddevWords()
+    {
+    return dataStddevWords;
+    }
+
+  @Option(name = "-gws", aliases = {
+    "--generate-words-stddev"}, usage = "standard-deviation of a normal distribution from dictionary", required = false)
+  public void setDataStddevWords( float dataStddevWords )
+    {
+    this.dataStddevWords = dataStddevWords;
+    }
+
+  public int getDataNSigmaWords()
+    {
+    return dataNSigmaWords;
+    }
+
+  @Option(name = "-gwn", aliases = {
+    "--generate-words-nsigma"}, usage = "number of stddev in tail of a normal distribution from dictionary", required = false)
+  public void setDataNSigmaWords( int dataNSigmaWords )
+    {
+    this.dataNSigmaWords = dataNSigmaWords;
+    }
+
+  public boolean useNormalDistribution()
+    {
+    return dataMeanWords != -1 || dataStddevWords != -1 || dataNSigmaWords != -1;
+    }
+
+  public String getDataNormalDesc()
+    {
+    return "normal(" + getDataMeanWords() + "," + getDataStddevWords() + "," + getDataNSigmaWords() + ")";
+    }
+
   ////////////////////////////////////////
 
   public boolean isCountSort()
@@ -516,6 +570,7 @@ public class Options
     sb.append( ", fillFilesPerAvailMapper=" ).append( fillFilesPerAvailMapper );
     sb.append( ", countSort=" ).append( countSort );
     sb.append( ", multiJoin=" ).append( multiJoin );
+    sb.append( ", wordDistribution=" ).append( useNormalDistribution() ? getDataNormalDesc() : "uniform" );
     sb.append( '}' );
     return sb.toString();
     }
