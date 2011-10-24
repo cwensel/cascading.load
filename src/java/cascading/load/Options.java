@@ -403,11 +403,11 @@ public class Options
     }
 
   @Option(name = "-gwm", aliases = {
-    "--generate-words-mean"}, usage = "mean modifier [0,1] of a normal distribution from dictionary", required = false)
+    "--generate-words-mean"}, usage = "mean modifier [-1,1] of a normal distribution from dictionary", required = false)
   public void setDataMeanWords( float dataMeanWords )
     {
-    if( dataMeanWords < 0 )
-      dataMeanWords = 0;
+    if( dataMeanWords < -1 )
+      dataMeanWords = -1;
     else if( dataMeanWords > 1 )
       dataMeanWords = 1;
     this.dataMeanWords = dataMeanWords;
