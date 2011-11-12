@@ -41,7 +41,9 @@ class TupleGenerator extends BaseOperation implements Function
       this.random = new Random( System.currentTimeMillis() );
       }
 
-    // Next integer in 0..max from distribution.
+    /*
+     * Next integer in 0..max from distribution.
+     */
     abstract int next();
     }
 
@@ -75,7 +77,7 @@ class TupleGenerator extends BaseOperation implements Function
 
     int next()
       {
-      // Using a "clamp" method, "rejection", or "modulo" results in a similar stddev,
+      // Using a "clamp", "rejection", or "modulo" method results in a similar distribution,
       // at least for a large (100k) sample size.
       int res = (int) Math.round( mean + stddev * random.nextGaussian() );
       if( res < 0 )

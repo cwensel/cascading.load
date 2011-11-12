@@ -155,10 +155,6 @@ public class AllLoadsTest extends LoadTestCase
       "-p",
 
       "-SLS"
-
-      //TODO own test
-      //,"-gwm", "0"
-      ,"-gws", "0.2"
     };
 
     assertTrue( new Main( args ).execute() );
@@ -170,6 +166,38 @@ public class AllLoadsTest extends LoadTestCase
       lineNo = ln.getLineNumber();
     ln.close();
     assertEquals( 15, lineNo );
+    }
+
+  public void testAllDiscreteFlows() throws Exception
+    {
+    String output = this.output + "mainadf/";
+
+    String[] args = new String[]{
+      "-S", output + "status",
+      "-I", output + "input",
+      "-W", output + "working",
+      "-O", output + "output",
+
+      "-MXCF", "0",                 // Serial execution
+
+      "-g",
+      "-gf", "1",
+      "-gs", "1",
+
+      "-ss", "-fg",                 // Every discrete flow
+      "-ij", "-oj", "-lj", "-rj",
+      "-cf", "-ca",
+
+      //TODO own test
+      "-gwm", "0",                  // Normal distribution
+      "-gws", "0.2",
+
+      "-SLS"
+    };
+
+    assertTrue( new Main( args ).execute() );
+
+    assertEquals( 8, new File( output + "output" ).list().length );
     }
 
   }

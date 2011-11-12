@@ -22,9 +22,17 @@ import cascading.cascade.CascadeConnector;
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
 import cascading.load.countsort.CountSort;
+import cascading.load.countsort.StaggeredSort;
+import cascading.load.countsort.FullTupleGroup;
 import cascading.load.generate.GenerateData;
 import cascading.load.join.MultiJoin;
+import cascading.load.join.OnlyLeftJoin;
+import cascading.load.join.OnlyRightJoin;
+import cascading.load.join.OnlyOuterJoin;
+import cascading.load.join.OnlyInnerJoin;
 import cascading.load.pipeline.Pipeline;
+import cascading.load.pipeline.ChainedFunction;
+import cascading.load.pipeline.ChainedAggregate;
 import cascading.load.util.StatsPrinter;
 import cascading.load.util.Util;
 import cascading.operation.DebugLevel;
@@ -67,6 +75,9 @@ public class Main
     {
     List<Flow> flows = new ArrayList<Flow>();
 
+    // This is unweildy
+    // todo: use reflection (?) w/ table of load classes instead
+
     if( options.isDataGenerate() )
       flows.add( new GenerateData( options, getDefaultProperties() ).createFlow() );
 
@@ -78,6 +89,33 @@ public class Main
 
     if( options.isPipeline() )
       flows.add( new Pipeline( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isStaggeredSort() )
+      flows.add( new StaggeredSort( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isFullTupleGroup() )
+      flows.add( new FullTupleGroup( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isChainedAggregate() )
+      flows.add( new ChainedAggregate( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isChainedFunction() )
+      flows.add( new ChainedFunction( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isLeftJoin() )
+      flows.add( new OnlyLeftJoin( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isRightJoin() )
+      flows.add( new OnlyRightJoin( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isInnerJoin() )
+      flows.add( new OnlyInnerJoin( options, getDefaultProperties() ).createFlow() );
+
+    if( options.isOuterJoin() )
+      flows.add( new OnlyOuterJoin( options, getDefaultProperties() ).createFlow() );
+
+    if( options.getMaxConcurrentFlows() != -1 )
+      Cascade.setMaxConcurrentFlows( getDefaultProperties(), options.getMaxConcurrentFlows() );
 
     Cascade cascade = new CascadeConnector( getDefaultProperties() ).connect( flows.toArray( new Flow[ 0 ] ) );
 

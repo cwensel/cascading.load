@@ -19,6 +19,7 @@ import org.kohsuke.args4j.Option;
 public class Options
   {
   private static final Logger LOG = Logger.getLogger( Options.class );
+
   public static final float MIN_DATA_STDDEV = Float.MIN_VALUE;
   public static final float DEF_DATA_STDDEV = 0.2f;
   public static final float MAX_DATA_STDDEV = 0.9999f;
@@ -37,6 +38,8 @@ public class Options
   int numMappersPerBlock = 1; // multiplier for num mappers, needs 1.2 wip for this
   int numReducersPerMapper = -1;
   String childVMOptions = "-Xmx1000m -XX:+UseParallelOldGC";
+
+  int maxConcurrentFlows = -1;
 
   String inputRoot;
   String outputRoot;
@@ -59,10 +62,18 @@ public class Options
   float dataStddevWords = -1;
 
   boolean countSort;
+  boolean staggeredSort;
+  boolean fullTupleGroup;
 
   boolean multiJoin;
+  boolean innerJoin;
+  boolean outerJoin;
+  boolean leftJoin;
+  boolean rightJoin;
 
   boolean pipeline;
+  boolean chainedAggregate;
+  boolean chainedFunction;
   int hashModulo = -1;
 
   public boolean isSinglelineStats()
@@ -281,6 +292,20 @@ public class Options
     this.childVMOptions = childVMOptions;
     }
 
+  public int getMaxConcurrentFlows()
+    {
+    return maxConcurrentFlows;
+    }
+
+  @Option(name = "-MXCF", usage = "maximum concurrent flows", required = false)
+  public void setMaxConcurrentFlows( int maxConcurrentFlows )
+    {
+    // Treat as "default" setting
+    if( maxConcurrentFlows < 0 )
+      maxConcurrentFlows = -1;
+    this.maxConcurrentFlows = maxConcurrentFlows;
+    }
+
   private String makePathDir( String path )
     {
     if( path == null || path.isEmpty() )
@@ -297,7 +322,7 @@ public class Options
     return runAllLoads;
     }
 
-  @Option(name = "-ALL", usage = "run all available loads", required = false)
+  @Option(name = "-ALL", usage = "run all available (non-discrete) loads", required = false)
   public void setRunAllLoads( boolean runAllLoads )
     {
     this.runAllLoads = runAllLoads;
@@ -394,7 +419,7 @@ public class Options
     this.fillFilesPerAvailMapper = fillFilesPerAvailMapper;
     }
 
-  //TODO --generate-words-normal [<mean>][,<stddev>][,<nsigma>]
+  //TODO --generate-words-normal [<mean>][,<stddev>]
   //Note that ',' is a potential decimal-point
 
   public float getDataMeanWords()
@@ -434,7 +459,7 @@ public class Options
     return dataMeanWords != -1 || dataStddevWords != -1;
     }
 
-  public String getDataNormalDesc()
+  private String getDataNormalDesc()
     {
     return "normal(" + getDataMeanWords() + "," + getDataStddevWords() + ")";
     }
@@ -452,6 +477,28 @@ public class Options
     this.countSort = countSort;
     }
 
+  public boolean isStaggeredSort()
+    {
+    return staggeredSort;
+    }
+
+  @Option(name = "-ss", aliases = {"--staggered-sort"}, usage = "run staggered compare sort load", required = false)
+  public void setStaggeredSort( boolean staggeredSort )
+    {
+    this.staggeredSort = staggeredSort;
+    }
+
+  public boolean isFullTupleGroup()
+    {
+    return fullTupleGroup;
+    }
+
+  @Option(name = "-fg", aliases = {"--full-group"}, usage = "run full tuple grouping load", required = false)
+  public void setFullTupleGroup( boolean fullTupleGroup )
+    {
+    this.fullTupleGroup = fullTupleGroup;
+    }
+
   ////////////////////////////////////////
 
   public boolean isMultiJoin()
@@ -463,6 +510,50 @@ public class Options
   public void setMultiJoin( boolean multiJoin )
     {
     this.multiJoin = multiJoin;
+    }
+
+  public boolean isInnerJoin()
+    {
+    return innerJoin;
+    }
+
+  @Option(name = "-ij", aliases = {"--inner-join"}, usage = "run inner join load", required = false)
+  public void setInnerJoin( boolean innerJoin )
+    {
+    this.innerJoin = innerJoin;
+    }
+
+  public boolean isOuterJoin()
+    {
+    return outerJoin;
+    }
+
+  @Option(name = "-oj", aliases = {"--outer-join"}, usage = "run outer join load", required = false)
+  public void setOuterJoin( boolean outerJoin )
+    {
+    this.outerJoin = outerJoin;
+    }
+
+  public boolean isLeftJoin()
+    {
+    return leftJoin;
+    }
+
+  @Option(name = "-lj", aliases = {"--left-join"}, usage = "run left join load", required = false)
+  public void setLeftJoin( boolean leftJoin )
+    {
+    this.leftJoin = leftJoin;
+    }
+
+  public boolean isRightJoin()
+    {
+    return rightJoin;
+    }
+
+  @Option(name = "-rj", aliases = {"--right-join"}, usage = "run right join load", required = false)
+  public void setRightJoin( boolean rightJoin )
+    {
+    this.rightJoin = rightJoin;
     }
 
   ////////////////////////////////////////
@@ -488,6 +579,28 @@ public class Options
   public void setHashModulo( int hashModulo )
     {
     this.hashModulo = hashModulo;
+    }
+
+  public boolean isChainedAggregate()
+    {
+    return chainedAggregate;
+    }
+
+  @Option(name = "-ca", aliases = {"--chained-aggregate"}, usage = "run chained aggregate load", required = false)
+  public void setChainedAggregate( boolean chainedAggregate )
+    {
+    this.chainedAggregate = chainedAggregate;
+    }
+
+  public boolean isChainedFunction()
+    {
+    return chainedFunction;
+    }
+
+  @Option(name = "-cf", aliases = {"--chained-function"}, usage = "run chained function load", required = false)
+  public void setChainedFunction( boolean chainedFunction )
+    {
+    this.chainedFunction = chainedFunction;
     }
 
   ////////////////////////////////////////
@@ -533,6 +646,43 @@ public class Options
       }
     }
 
+  private String getLoadsDesc()
+    {
+    final StringBuilder loads = new StringBuilder( "(" );
+
+    if( dataGenerate )
+      loads.append( "dataGenerate," );
+    if( pipeline )
+      loads.append( "pipeline," );
+    if( countSort )
+      loads.append( "countSort," );
+    if( multiJoin )
+      loads.append( "multiJoin," );
+    if( fullTupleGroup )
+      loads.append( "fullTupleGroup," );
+    if( staggeredSort )
+      loads.append( "staggeredSort," );
+    if( chainedFunction )
+      loads.append( "chainedFunction," );
+    if( chainedAggregate )
+      loads.append( "chainedAggregate," );
+    if( innerJoin )
+      loads.append( "innerJoin," );
+    if( outerJoin )
+      loads.append( "outerJoin," );
+    if( leftJoin )
+      loads.append( "leftJoin," );
+    if( rightJoin )
+      loads.append( "rightJoin," );
+
+    if( loads.length() > 1 )
+      loads.setCharAt( loads.length() - 1, ')' );
+    else
+      loads.append( ')' );
+
+    return loads.toString();
+    }
+
   @Override
   public String toString()
     {
@@ -555,8 +705,6 @@ public class Options
     sb.append( ", outputRoot='" ).append( outputRoot ).append( '\'' );
     sb.append( ", workingRoot='" ).append( workingRoot ).append( '\'' );
     sb.append( ", statsRoot='" ).append( statsRoot ).append( '\'' );
-    sb.append( ", runAllLoads=" ).append( runAllLoads );
-    sb.append( ", dataGenerate=" ).append( dataGenerate );
     sb.append( ", dataNumFiles=" ).append( dataNumFiles );
     sb.append( ", dataFileSizeMB=" ).append( dataFileSizeMB );
     sb.append( ", dataMaxWords=" ).append( dataMaxWords );
@@ -564,8 +712,7 @@ public class Options
     sb.append( ", dataWordDelimiter='" ).append( dataWordDelimiter ).append( '\'' );
     sb.append( ", fillBlocksPerFile=" ).append( fillBlocksPerFile );
     sb.append( ", fillFilesPerAvailMapper=" ).append( fillFilesPerAvailMapper );
-    sb.append( ", countSort=" ).append( countSort );
-    sb.append( ", multiJoin=" ).append( multiJoin );
+    sb.append( ", loads=" ).append( getLoadsDesc() );
     sb.append( ", wordDistribution=" ).append( useNormalDistribution() ? getDataNormalDesc() : "uniform" );
     sb.append( '}' );
     return sb.toString();
