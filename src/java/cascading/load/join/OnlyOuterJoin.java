@@ -64,10 +64,7 @@ public class OnlyOuterJoin extends Load
     Pipe[] heads = Pipe.pipes( uniques, fielded );
     Map<String, Tap> sources = Cascades.tapsMap( heads, Tap.taps( source, source ) );
 
-    Pipe[] tails = Pipe.pipes( outer );
-    Map<String, Tap> sinks = Cascades.tapsMap( tails, Tap.taps( outerSink ) );
-
-    return new FlowConnector( properties ).connect( "outer-join", sources, sinks, tails );
+    return new FlowConnector( properties ).connect( "outer-join", sources, outerSink, outer );
     }
 
   @Override

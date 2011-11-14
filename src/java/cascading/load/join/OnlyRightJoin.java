@@ -64,10 +64,7 @@ public class OnlyRightJoin extends Load
     Pipe[] heads = Pipe.pipes( uniques, fielded );
     Map<String, Tap> sources = Cascades.tapsMap( heads, Tap.taps( source, source ) );
 
-    Pipe[] tails = Pipe.pipes( right );
-    Map<String, Tap> sinks = Cascades.tapsMap( tails, Tap.taps( rightSink ) );
-
-    return new FlowConnector( properties ).connect( "right-join", sources, sinks, tails );
+    return new FlowConnector( properties ).connect( "right-join", sources, rightSink, right );
     }
 
   @Override

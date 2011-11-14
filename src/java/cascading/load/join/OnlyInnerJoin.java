@@ -64,10 +64,7 @@ public class OnlyInnerJoin extends Load
     Pipe[] heads = Pipe.pipes( uniques, fielded );
     Map<String, Tap> sources = Cascades.tapsMap( heads, Tap.taps( source, source ) );
 
-    Pipe[] tails = Pipe.pipes( inner );
-    Map<String, Tap> sinks = Cascades.tapsMap( tails, Tap.taps( innerSink ) );
-
-    return new FlowConnector( properties ).connect( "inner-join", sources, sinks, tails );
+    return new FlowConnector( properties ).connect( "inner-join", sources, innerSink, inner );
     }
 
   @Override
