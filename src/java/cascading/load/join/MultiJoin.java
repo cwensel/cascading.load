@@ -47,11 +47,11 @@ public class MultiJoin extends Load
   @Override
   public Flow createFlow() throws Exception
     {
-    Tap source = new Hfs( new TextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
-    Tap innerSink = new Hfs( new TextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
-    Tap outerSink = new Hfs( new TextLine(), getOutputPaths()[ 1 ], SinkMode.REPLACE );
-    Tap leftSink = new Hfs( new TextLine(), getOutputPaths()[ 2 ], SinkMode.REPLACE );
-    Tap rightSink = new Hfs( new TextLine(), getOutputPaths()[ 3 ], SinkMode.REPLACE );
+    Tap source = platform.newTap( platform.newTextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
+    Tap innerSink = platform.newTap( platform.newTextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
+    Tap outerSink = platform.newTap( platform.newTextLine(), getOutputPaths()[ 1 ], SinkMode.REPLACE );
+    Tap leftSink = platform.newTap( platform.newTextLine(), getOutputPaths()[ 2 ], SinkMode.REPLACE );
+    Tap rightSink = platform.newTap( platform.newTextLine(), getOutputPaths()[ 3 ], SinkMode.REPLACE );
 
     Pipe uniques = new Pipe( "unique" );
 
@@ -80,7 +80,7 @@ public class MultiJoin extends Load
     Pipe[] tails = Pipe.pipes( inner, outer, left, right );
     Map<String, Tap> sinks = Cascades.tapsMap( tails, Tap.taps( innerSink, outerSink, leftSink, rightSink ) );
 
-    return new FlowConnector( properties ).connect( "multi-joins", sources, sinks, tails );
+    return platform.newFlowConnector( properties ).connect( "multi-joins", sources, sinks, tails );
     }
 
   @Override

@@ -21,6 +21,7 @@ import cascading.cascade.Cascade;
 import cascading.cascade.CascadeConnector;
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
+import cascading.load.common.CascadeLoadPlatform;
 import cascading.load.countsort.CountSort;
 import cascading.load.countsort.StaggeredSort;
 import cascading.load.countsort.FullTupleGroup;
@@ -39,7 +40,7 @@ import cascading.operation.DebugLevel;
 import cascading.pipe.cogroup.CoGroupClosure;
 import cascading.scheme.TextLine;
 import cascading.stats.CascadeStats;
-import cascading.tap.Hfs;
+import cascading.tap.Tap;
 import cascading.tap.SinkMode;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
@@ -58,6 +59,7 @@ public class Main
   private static final Logger LOG = Logger.getLogger( Options.class );
 
   private Options options;
+  private CascadeLoadPlatform platform;
 
   public static void main( String[] args ) throws Exception
     {
@@ -69,6 +71,8 @@ public class Main
     options = new Options();
 
     initOptions( args, options );
+
+    platform = CascadeLoadPlatform.getPlatform( options );
     }
 
   public boolean execute() throws Exception
@@ -181,9 +185,9 @@ public class Main
       {
       String[] lines = outputStream.toString().split( "\n" );
 
-      Hfs statsTap = new Hfs( new TextLine(), options.getStatsRoot(), SinkMode.REPLACE );
+      Tap statsTap = platform.newTap( new TextLine(), options.getStatsRoot(), SinkMode.REPLACE );
 
-      TupleEntryCollector tapWriter = statsTap.openForWrite( new JobConf() );
+      TupleEntryCollector tapWriter = platform.newTupleEntryCollector( statsTap );
 
       for( String line : lines )
         tapWriter.add( new Tuple( line ) );

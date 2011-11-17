@@ -42,8 +42,8 @@ public class OnlyLeftJoin extends Load
   @Override
   public Flow createFlow() throws Exception
     {
-    Tap source = new Hfs( new TextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
-    Tap leftSink = new Hfs( new TextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
+    Tap source = platform.newTap( platform.newTextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
+    Tap leftSink = platform.newTap( platform.newTextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
 
     Pipe uniques = new Pipe( "unique" );
 
@@ -64,7 +64,7 @@ public class OnlyLeftJoin extends Load
     Pipe[] heads = Pipe.pipes( uniques, fielded );
     Map<String, Tap> sources = Cascades.tapsMap( heads, Tap.taps( source, source ) );
 
-    return new FlowConnector( properties ).connect( "left-join", sources, leftSink, left );
+    return platform.newFlowConnector( properties ).connect( "left-join", sources, leftSink, left );
     }
 
   @Override

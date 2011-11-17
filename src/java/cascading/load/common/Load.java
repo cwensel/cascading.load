@@ -18,12 +18,14 @@ public abstract class Load
   {
   protected Options options;
   protected Properties properties;
+  protected CascadeLoadPlatform platform;
 
   public Load( Options options, Properties properties )
     {
     this.options = options;
 //    this.properties = new Properties( properties );
     this.properties = properties;
+    this.platform = CascadeLoadPlatform.getPlatform( options );
     }
 
   public abstract Flow createFlow() throws Exception;

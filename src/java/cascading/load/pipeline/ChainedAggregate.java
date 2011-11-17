@@ -39,8 +39,8 @@ public class ChainedAggregate extends Load
   @Override
   public Flow createFlow() throws Exception
     {
-    Tap source = new Hfs( new TextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
-    Tap sink = new Hfs( new TextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
+    Tap source = platform.newTap( platform.newTextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
+    Tap sink = platform.newTap( platform.newTextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
 
     Pipe pipe = new Pipe( "chainedaggregate" );
 
@@ -59,7 +59,7 @@ public class ChainedAggregate extends Load
     for( int i = 0; i < 50; i++ )
       pipe = new Every( pipe, new Fields( "count" ), new Sum( new Fields( "sum" + ( i + 1 ) ) ) );
 
-    return new FlowConnector( properties ).connect( "chainedaggregate", source, sink, pipe );
+    return platform.newFlowConnector( properties ).connect( "chainedaggregate", source, sink, pipe );
     }
 
   @Override

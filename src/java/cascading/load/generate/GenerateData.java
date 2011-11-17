@@ -43,15 +43,15 @@ public class GenerateData extends Load
     {
     dictionaryPath = writeDictionaryTuples();
 
-    Tap source = new Hfs( new TextLine( new Fields( "line" ) ), dictionaryPath );
-    Tap sink = new Hfs( new TextLine( new Fields( "line" ) ), options.getInputRoot(), SinkMode.REPLACE );
+    Tap source = platform.newTap( platform.newTextLine( new Fields( "line" ) ), dictionaryPath );
+    Tap sink = platform.newTap( platform.newTextLine( new Fields( "line" ) ), options.getInputRoot(), SinkMode.REPLACE );
 
     Pipe pipe = new Pipe( "load-generator" );
 
     pipe = new Each( pipe, new Fields( "line" ), new RegexSplitter( "\t" ) );
     pipe = new Each( pipe, new TupleGenerator( options, new Fields( "line" ) ) );
 
-    return new FlowConnector( properties ).connect( "generate-data", source, sink, pipe );
+    return platform.newFlowConnector( properties ).connect( "generate-data", source, sink, pipe );
     }
 
   @Override
@@ -81,7 +81,7 @@ public class GenerateData extends Load
     output.addAll( (Object[]) dictionary.toArray( new String[dictionary.size()] ) );
 
     String workingPath = options.getWorkingRoot() + "dictionary/";
-    Tap tap = new Hfs( new TextLine(), workingPath );
+    Tap tap = platform.newTap( new TextLine(), workingPath );
     JobConf jobConf = new JobConf();
 
     for( int i = 0; i < options.getDataNumFiles(); i++ )

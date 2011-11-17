@@ -43,8 +43,8 @@ public class StaggeredSort extends Load
   @Override
   public Flow createFlow() throws Exception
     {
-    Tap source = new Hfs( new TextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
-    Tap sink = new Hfs( new TextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
+    Tap source = platform.newTap( platform.newTextLine( new Fields( "line" ) ), getInputPaths()[ 0 ] );
+    Tap sink = platform.newTap( platform.newTextLine(), getOutputPaths()[ 0 ], SinkMode.REPLACE );
 
     Pipe pipe = new Pipe( "staggered-sort" );
 
@@ -61,7 +61,7 @@ public class StaggeredSort extends Load
     // 2nd sort on every other field
     pipe = new GroupBy( pipe, new Fields( "word" ), new Fields( "f0", "f2", "f4", "f6", "f8" ) );
 
-    return new FlowConnector( properties ).connect( "staggered-sort", source, sink, pipe );
+    return platform.newFlowConnector( properties ).connect( "staggered-sort", source, sink, pipe );
     }
 
   @Override
