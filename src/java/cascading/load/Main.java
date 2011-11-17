@@ -38,7 +38,6 @@ import cascading.load.util.StatsPrinter;
 import cascading.load.util.Util;
 import cascading.operation.DebugLevel;
 import cascading.pipe.cogroup.CoGroupClosure;
-import cascading.scheme.TextLine;
 import cascading.stats.CascadeStats;
 import cascading.tap.Tap;
 import cascading.tap.SinkMode;
@@ -185,7 +184,7 @@ public class Main
       {
       String[] lines = outputStream.toString().split( "\n" );
 
-      Tap statsTap = platform.newTap( new TextLine(), options.getStatsRoot(), SinkMode.REPLACE );
+      Tap statsTap = platform.newTap( platform.newTextLine(), options.getStatsRoot(), SinkMode.REPLACE );
 
       TupleEntryCollector tapWriter = platform.newTupleEntryCollector( statsTap );
 

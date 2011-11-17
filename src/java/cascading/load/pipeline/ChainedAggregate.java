@@ -9,7 +9,6 @@ package cascading.load.pipeline;
 import java.util.Properties;
 
 import cascading.flow.Flow;
-import cascading.flow.FlowConnector;
 import cascading.load.Options;
 import cascading.load.common.Load;
 import cascading.operation.Function;
@@ -19,8 +18,6 @@ import cascading.pipe.Each;
 import cascading.pipe.Every;
 import cascading.pipe.GroupBy;
 import cascading.pipe.Pipe;
-import cascading.scheme.TextLine;
-import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;

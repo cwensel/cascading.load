@@ -11,7 +11,6 @@ import java.util.Properties;
 
 import cascading.cascade.Cascades;
 import cascading.flow.Flow;
-import cascading.flow.FlowConnector;
 import cascading.load.Options;
 import cascading.load.common.Load;
 import cascading.operation.aggregator.First;
@@ -27,8 +26,6 @@ import cascading.pipe.cogroup.InnerJoin;
 import cascading.pipe.cogroup.LeftJoin;
 import cascading.pipe.cogroup.OuterJoin;
 import cascading.pipe.cogroup.RightJoin;
-import cascading.scheme.TextLine;
-import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;

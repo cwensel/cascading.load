@@ -12,15 +12,12 @@ import java.util.List;
 import java.util.Properties;
 
 import cascading.flow.Flow;
-import cascading.flow.FlowConnector;
 import cascading.load.Options;
 import cascading.load.common.Load;
 import cascading.load.util.Util;
 import cascading.operation.regex.RegexSplitter;
 import cascading.pipe.Each;
 import cascading.pipe.Pipe;
-import cascading.scheme.TextLine;
-import cascading.tap.Hfs;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
@@ -81,7 +78,7 @@ public class GenerateData extends Load
     output.addAll( (Object[]) dictionary.toArray( new String[dictionary.size()] ) );
 
     String workingPath = options.getWorkingRoot() + "dictionary/";
-    Tap tap = platform.newTap( new TextLine(), workingPath );
+    Tap tap = platform.newTap( platform.newTextLine(), workingPath );
     JobConf jobConf = new JobConf();
 
     for( int i = 0; i < options.getDataNumFiles(); i++ )
