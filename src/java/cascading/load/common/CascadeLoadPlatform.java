@@ -40,6 +40,8 @@ import org.apache.hadoop.mapred.JobConf;
  * Provides access to Cascading platform (local or hadoop) specific implementation objects.
  *
  * Only those aspects used by cascading.load are supported.
+ *
+ * Not thread safe.
  */
 public abstract class CascadeLoadPlatform
   {
@@ -52,41 +54,49 @@ public abstract class CascadeLoadPlatform
       // has no state
       }
 
+    @Override
     public Tap newTap( Scheme scheme, String stringPath )
       {
       return new Hfs( scheme, stringPath );
       }
 
+    @Override
     public Tap newTap( Scheme scheme, String stringPath, SinkMode sinkMode )
       {
       return new Hfs( scheme, stringPath, sinkMode );
       }
 
+    @Override
     public TupleEntryCollector newTupleEntryCollector( Tap tap ) throws IOException
       {
       return tap.openForWrite( new JobConf() );
       }
 
+    @Override
     public Scheme newTextLine()
       {
       return new TextLine();
       }
 
+    @Override
     public Scheme newTextLine( Fields sourceFields )
       {
       return new TextLine( sourceFields );
       }
 
+    @Override
     public Scheme newTextLine( Fields sourceFields, Fields sinkFields )
       {
       return new TextLine( sourceFields, sinkFields );
       }
 
+    @Override
     public FlowConnector newFlowConnector()
       {
       return new FlowConnector();
       }
 
+    @Override
     public FlowConnector newFlowConnector( Map<Object,Object> properties )
       {
       return new FlowConnector( properties );
@@ -95,7 +105,6 @@ public abstract class CascadeLoadPlatform
 
   public static CascadeLoadPlatform getPlatform( Options options )
     {
-    // not thread safe
     if( hadoopCascadePlatform == null )
       hadoopCascadePlatform = new HadoopCascadePlatform();
     return hadoopCascadePlatform;
