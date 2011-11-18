@@ -49,6 +49,8 @@ public class Options
 
   boolean cleanWorkFiles = false;
 
+  private boolean localMode = false;
+
   boolean runAllLoads = false;
 
   boolean dataGenerate;
@@ -342,6 +344,17 @@ public class Options
   public void setRunAllLoads( boolean runAllLoads )
     {
     this.runAllLoads = runAllLoads;
+    }
+
+  public boolean isLocalMode()
+    {
+    return localMode;
+    }
+
+  @Option(name = "-LM", usage = "use the local platform", required = false)
+  public void setLocalMode( boolean localMode )
+    {
+    this.localMode = localMode;
     }
 
 //////////////////////////////////
@@ -704,7 +717,8 @@ public class Options
     {
     final StringBuilder sb = new StringBuilder();
     sb.append( "Options" );
-    sb.append( "{singlelineStats=" ).append( singlelineStats );
+    sb.append( "{localMode=" ).append( localMode );
+    sb.append( ", singlelineStats=" ).append( singlelineStats );
     sb.append( ", debugLogging=" ).append( debugLogging );
     sb.append( ", blockSizeMB=" ).append( blockSizeMB );
     sb.append( ", numDefaultMappers=" ).append( numDefaultMappers );

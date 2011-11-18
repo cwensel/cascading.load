@@ -80,17 +80,29 @@ public class GenerateData extends Load
 
     String workingPath = options.getWorkingRoot() + "dictionary/";
     Tap tap = platform.newTap( platform.newTextLine(), workingPath );
-    JobConf jobConf = new JobConf();
 
-    for( int i = 0; i < options.getDataNumFiles(); i++ )
+    if( options.isLocalMode() )
       {
-      jobConf.setInt( "mapred.task.partition", i );
-
-      TupleEntryCollector writer = tap.openForWrite( new HadoopFlowProcess( jobConf ) );
+      TupleEntryCollector writer = platform.newTupleEntryCollector( tap );
 
       writer.add( output );
 
       writer.close();
+      }
+    else
+      {
+      JobConf jobConf = new JobConf();
+
+      for( int i = 0; i < options.getDataNumFiles(); i++ )
+        {
+        jobConf.setInt( "mapred.task.partition", i );
+
+        TupleEntryCollector writer = tap.openForWrite( new HadoopFlowProcess( jobConf ) );
+
+        writer.add( output );
+
+        writer.close();
+        }
       }
 
     return workingPath;

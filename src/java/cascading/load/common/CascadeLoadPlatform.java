@@ -34,6 +34,10 @@ import cascading.tuple.TupleEntryCollector;
 import cascading.flow.hadoop.HadoopFlowProcess;
 import cascading.tap.hadoop.Hfs;
 import cascading.flow.hadoop.HadoopFlowConnector;
+import cascading.tap.local.FileTap;
+import cascading.flow.local.LocalFlowProcess;
+import cascading.flow.local.LocalFlowConnector;
+import cascading.scheme.local.LocalScheme;
 
 import org.apache.hadoop.mapred.JobConf;
 
@@ -47,6 +51,7 @@ import org.apache.hadoop.mapred.JobConf;
 public abstract class CascadeLoadPlatform
   {
   private static CascadeLoadPlatform hadoopCascadePlatform = null;
+  private static CascadeLoadPlatform localCascadePlatform = null;
 
   private static final class HadoopCascadePlatform extends CascadeLoadPlatform
     {
@@ -104,11 +109,76 @@ public abstract class CascadeLoadPlatform
       }
     }
 
+  private static final class LocalCascadePlatform extends CascadeLoadPlatform
+    {
+    protected LocalCascadePlatform()
+      {
+      // has no state
+      }
+
+    @Override
+    public Tap newTap( Scheme scheme, String stringPath )
+      {
+      return new FileTap( (LocalScheme) scheme, stringPath );
+      }
+
+    @Override
+    public Tap newTap( Scheme scheme, String stringPath, SinkMode sinkMode )
+      {
+      return new FileTap( (LocalScheme) scheme, stringPath, sinkMode );
+      }
+
+    @Override
+    public TupleEntryCollector newTupleEntryCollector( Tap tap ) throws IOException
+      {
+      return tap.openForWrite( new LocalFlowProcess() );
+      }
+
+    @Override
+    public Scheme newTextLine()
+      {
+      return new cascading.scheme.local.TextLine();
+      }
+
+    @Override
+    public Scheme newTextLine( Fields sourceFields )
+      {
+      return new cascading.scheme.local.TextLine( sourceFields );
+      }
+
+    @Override
+    public Scheme newTextLine( Fields sourceFields, Fields sinkFields )
+      {
+      return new cascading.scheme.local.TextLine( sourceFields, sinkFields );
+      }
+
+    @Override
+    public FlowConnector newFlowConnector()
+      {
+      return new LocalFlowConnector();
+      }
+
+    @Override
+    public FlowConnector newFlowConnector( Map<Object,Object> properties )
+      {
+      return new LocalFlowConnector( properties );
+      }
+    }
+
   public static CascadeLoadPlatform getPlatform( Options options )
     {
-    if( hadoopCascadePlatform == null )
-      hadoopCascadePlatform = new HadoopCascadePlatform();
-    return hadoopCascadePlatform;
+    if( options.isLocalMode() )
+      {
+      if( localCascadePlatform == null )
+        localCascadePlatform = new LocalCascadePlatform();
+      return localCascadePlatform;
+      }
+    else
+      {
+      if( hadoopCascadePlatform == null )
+        hadoopCascadePlatform = new HadoopCascadePlatform();
+      return hadoopCascadePlatform;
+      }
     }
 
   public abstract Tap newTap( Scheme scheme, String stringPath );

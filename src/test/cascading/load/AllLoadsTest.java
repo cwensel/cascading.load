@@ -212,4 +212,35 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 8, new File( output + "output" ).list().length );
     }
 
+  @Test
+  public void testLocalMode() throws Exception
+    {
+    String output = this.output + "mainlm/";
+
+    String[] args = new String[]{
+      "-S", output + "status",
+      "-I", output + "input",
+      "-W", output + "working",
+      "-O", output + "output",
+
+      "-LM",                        // Local mode
+
+      "-g",
+      //"-gf", "1",                 // Local mode only has single file support
+      "-gs", "1",
+
+      "-ALL",                       // Original loads
+
+      //TODO own test
+      "-gwm", "0",                  // Normal distribution
+      "-gws", "0.2",
+
+      "-SLS"
+    };
+
+    assertTrue( new Main( args ).execute() );
+
+    assertEquals( 6, new File( output + "output" ).list().length );
+    }
+
   }

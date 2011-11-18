@@ -206,43 +206,46 @@ public class Main
     else
       FlowConnector.setDebugLevel( properties, DebugLevel.NONE );
 
-    properties.setProperty( HadoopFlowProcess.SPILL_THRESHOLD, Integer.toString( options.getTupleSpillThreshold() ) );
+    if( !options.isLocalMode() )
+      {
+      properties.setProperty( HadoopFlowProcess.SPILL_THRESHOLD, Integer.toString( options.getTupleSpillThreshold() ) );
 
 //    properties.setProperty( "mapred.output.compress", "true" );
-    properties.setProperty( "mapred.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );
-    properties.setProperty( "mapred.output.compression.type", "BLOCK" );
-    properties.setProperty( "mapred.compress.map.output", "true" );
+      properties.setProperty( "mapred.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );
+      properties.setProperty( "mapred.output.compression.type", "BLOCK" );
+      properties.setProperty( "mapred.compress.map.output", "true" );
 
-    // -XX:+UseParallelOldGC -XX:ParallelGCThreads=1
-    properties.setProperty( "mapred.child.java.opts", "-server " + options.getChildVMOptions() );
+      // -XX:+UseParallelOldGC -XX:ParallelGCThreads=1
+      properties.setProperty( "mapred.child.java.opts", "-server " + options.getChildVMOptions() );
 
-    if( options.getNumDefaultMappers() != -1 )
-      properties.setProperty( "mapred.map.tasks", Integer.toString( options.getNumDefaultMappers() ) );
+      if( options.getNumDefaultMappers() != -1 )
+        properties.setProperty( "mapred.map.tasks", Integer.toString( options.getNumDefaultMappers() ) );
 
-    if( options.getNumDefaultReducers() != -1 )
-      properties.setProperty( "mapred.reduce.tasks", Integer.toString( options.getNumDefaultReducers() ) );
+      if( options.getNumDefaultReducers() != -1 )
+        properties.setProperty( "mapred.reduce.tasks", Integer.toString( options.getNumDefaultReducers() ) );
 
-    properties.setProperty( "mapred.map.tasks.speculative.execution", options.isMapSpecExec() ? "true" : "false" );
-    properties.setProperty( "mapred.reduce.tasks.speculative.execution", options.isReduceSpecExec() ? "true" : "false" );
+      properties.setProperty( "mapred.map.tasks.speculative.execution", options.isMapSpecExec() ? "true" : "false" );
+      properties.setProperty( "mapred.reduce.tasks.speculative.execution", options.isReduceSpecExec() ? "true" : "false" );
 
-    properties.setProperty( "dfs.block.size", Long.toString( options.getBlockSizeMB() * 1024 * 1024 ) );
+      properties.setProperty( "dfs.block.size", Long.toString( options.getBlockSizeMB() * 1024 * 1024 ) );
 
-    // need to try and detect if native codecs are loaded, if so, use gzip
-    if( Util.hasNativeZlib() )
-      {
-      properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );
-      LOG.info( "using native codec for gzip" );
-      }
-    else
-      {
-      properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.DefaultCodec" );
-      LOG.info( "native codec not found" );
-      }
+      // need to try and detect if native codecs are loaded, if so, use gzip
+      if( Util.hasNativeZlib() )
+        {
+        properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );
+        LOG.info( "using native codec for gzip" );
+        }
+      else
+        {
+        properties.setProperty( "mapred.map.output.compression.codec", "org.apache.hadoop.io.compress.DefaultCodec" );
+        LOG.info( "native codec not found" );
+        }
 
-    for( String property : options.getHadoopProperties() )
-      {
-      String[] split = property.split( "=" );
-      properties.setProperty( split[ 0 ], split[ 1 ] );
+      for( String property : options.getHadoopProperties() )
+        {
+        String[] split = property.split( "=" );
+        properties.setProperty( split[ 0 ], split[ 1 ] );
+        }
       }
 
     if( options.getMaxConcurrentFlows() != -1 )

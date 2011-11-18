@@ -45,6 +45,7 @@ repositories {
 dependencies {
   compile('cascading:cascading-core:2.0.0-wip-+') { exclude group: 'log4j' }
   compile('cascading:cascading-hadoop:2.0.0-wip-+') { transitive = false }
+  compile('cascading:cascading-local:2.0.0-wip-+') { transitive = false }
   compile('org.apache.hadoop:hadoop-core:0.20.2') { exclude group: 'ant' }
   compile('args4j:args4j:2.0.12')
   compile('log4j:log4j:1.2.16')
@@ -66,14 +67,15 @@ sourceSets {
 }
 
 task shellTest(type: Exec) {
-    commandLine = ['/bin/sh',"${rootDir}/src/test/sh/helper/roundup.sh".toString(),
-                             "${rootDir}/src/test/sh/core/*_test.sh".toString(),
-                             "${rootDir}/src/test/sh/cascading/*_test.sh".toString(),
-                             "${rootDir}/src/test/sh/*_test.sh".toString()]
+    commandLine = ['/bin/sh',"${rootDir}/src/test/sh/helper/roundup.sh",
+                             "${rootDir}/src/test/sh/core/*_test.sh",
+                             "${rootDir}/src/test/sh/cascading/*_test.sh",
+                             "${rootDir}/src/test/sh/*_test.sh"]
 }
 
 test {
   dependsOn 'shellTest'
+
   exclude '**/*TestCase*'
 }
 
