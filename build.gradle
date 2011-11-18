@@ -51,6 +51,7 @@ dependencies {
 
   testCompile('cascading:cascading-test:2.0.0-wip-+')
   testCompile('org.apache.hadoop:hadoop-test:0.20.2')
+  testCompile('junit:junit:4.8.+')
 }
 
 sourceSets {
@@ -64,7 +65,15 @@ sourceSets {
   }
 }
 
+task shellTest(type: Exec) {
+    commandLine = ['/bin/sh',"${rootDir}/src/test/sh/helper/roundup.sh".toString(),
+                             "${rootDir}/src/test/sh/core/*_test.sh".toString(),
+                             "${rootDir}/src/test/sh/cascading/*_test.sh".toString(),
+                             "${rootDir}/src/test/sh/*_test.sh".toString()]
+}
+
 test {
+  dependsOn 'shellTest'
   exclude '**/*TestCase*'
 }
 

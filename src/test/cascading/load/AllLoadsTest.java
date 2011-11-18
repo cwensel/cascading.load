@@ -15,10 +15,16 @@ import cascading.load.countsort.CountSort;
 import cascading.load.generate.GenerateData;
 import cascading.load.join.MultiJoin;
 import cascading.load.pipeline.Pipeline;
+import cascading.test.HadoopPlatform;
+import cascading.test.LocalPlatform;
+import cascading.test.PlatformRunner;
+import org.junit.Test;
 
 /**
  *
  */
+//@PlatformRunner.Platform({LocalPlatform.class, HadoopPlatform.class})
+@PlatformRunner.Platform({HadoopPlatform.class})
 public class AllLoadsTest extends LoadTestCase
   {
   String output = "build/test/output/load/";
@@ -28,6 +34,7 @@ public class AllLoadsTest extends LoadTestCase
     super();
     }
 
+  @Test
   public void testAllLoads() throws Exception
     {
     String output = this.output + "api/";
@@ -80,6 +87,7 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 2, new File( pipeline.getOutputPaths()[ 0 ] ).list().length );
     }
 
+  @Test
   public void testMain() throws Exception
     {
     String output = this.output + "main/";
@@ -106,6 +114,7 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 6, new File( output + "output" ).list().length );
     }
 
+  @Test
   public void testCleanWorkFiles() throws Exception
     {
     String output = this.output + "maincwf/";
@@ -134,6 +143,7 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 1, new File( output ).list().length );
     }
 
+  @Test
   public void testSingleLineStatus() throws Exception
     {
     String output = this.output + "mainsls/";
@@ -168,6 +178,7 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 15, lineNo );
     }
 
+  @Test
   public void testAllDiscreteFlows() throws Exception
     {
     String output = this.output + "mainadf/";
