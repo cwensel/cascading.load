@@ -6,6 +6,7 @@
 
 package cascading.load;
 
+import java.io.File;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -155,10 +156,19 @@ public class Main
     try
       {
       LOG.info( "cleaning work files" );
-      FileSystem fs = FileSystem.get( new JobConf() );
-      fs.delete( new Path( options.getInputRoot() ), true );
-      fs.delete( new Path( options.getWorkingRoot() ), true );
-      fs.delete( new Path( options.getOutputRoot() ), true );
+      if( options.isLocalMode() )
+        {
+        Util.deleteRecursive( new File( options.getInputRoot() ) );
+        Util.deleteRecursive( new File( options.getWorkingRoot() ) );
+        Util.deleteRecursive( new File( options.getOutputRoot() ) );
+        }
+      else
+        {
+        FileSystem fs = FileSystem.get( new JobConf() );
+        fs.delete( new Path( options.getInputRoot() ), true );
+        fs.delete( new Path( options.getWorkingRoot() ), true );
+        fs.delete( new Path( options.getOutputRoot() ), true );
+        }
       }
     catch( Exception exception )
       {

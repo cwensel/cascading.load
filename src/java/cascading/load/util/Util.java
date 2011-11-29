@@ -6,6 +6,8 @@
 
 package cascading.load.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +68,7 @@ public class Util
     for( String[] strings : values )
       Collections.addAll( list, strings );
 
-    return list.toArray( new String[list.size()] );
+    return list.toArray( new String[ list.size() ] );
     }
 
   public static String extractOrNull( Pattern pattern, String value )
@@ -186,5 +188,28 @@ public class Util
   public static boolean hasNativeZlib()
     {
     return ZlibFactory.isNativeZlibLoaded( new JobConf() );
+    }
+
+  /**
+   * By default File#delete fails for non-empty directories, it works like "rm".
+   * We need something a little more brutual - this does the equivalent of "rm -r"
+   *
+   * @param path Root File Path
+   * @return true iff the file and all sub files/directories have been removed
+   * @throws FileNotFoundException
+   */
+  public static boolean deleteRecursive( File path ) throws FileNotFoundException
+    {
+    if( !path.exists() )
+      throw new FileNotFoundException( path.getAbsolutePath() );
+    boolean ret = true;
+    if( path.isDirectory() )
+      {
+      for( File f : path.listFiles() )
+        {
+        ret = ret && Util.deleteRecursive( f );
+        }
+      }
+    return ret && path.delete();
     }
   }
