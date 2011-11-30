@@ -40,6 +40,7 @@ public class Options
   String childVMOptions = "-Xmx1000m -XX:+UseParallelOldGC";
 
   int maxConcurrentFlows = -1;
+  int maxConcurrentSteps = -1;
 
   String inputRoot;
   String outputRoot;
@@ -305,6 +306,21 @@ public class Options
       maxConcurrentFlows = -1;
     this.maxConcurrentFlows = maxConcurrentFlows;
     }
+
+  public int getMaxConcurrentSteps()
+    {
+    return maxConcurrentSteps;
+    }
+
+  @Option(name = "-MXCS", usage = "maximum concurrent steps", required = false)
+  public void setMaxConcurrentSteps( int maxConcurrentSteps )
+    {
+    // Treat as "default" setting
+    if( maxConcurrentSteps < 0 )
+      maxConcurrentSteps = -1;
+    this.maxConcurrentSteps = maxConcurrentSteps;
+    }
+
 
   private String makePathDir( String path )
     {
@@ -712,6 +728,8 @@ public class Options
     sb.append( ", dataWordDelimiter='" ).append( dataWordDelimiter ).append( '\'' );
     sb.append( ", fillBlocksPerFile=" ).append( fillBlocksPerFile );
     sb.append( ", fillFilesPerAvailMapper=" ).append( fillFilesPerAvailMapper );
+    sb.append( ", maxConcurrentFlows=" ).append( maxConcurrentFlows );
+    sb.append( ", maxConcurrentSteps=" ).append( maxConcurrentSteps );
     sb.append( ", loads=" ).append( getLoadsDesc() );
     sb.append( ", wordDistribution=" ).append( useNormalDistribution() ? getDataNormalDesc() : "uniform" );
     sb.append( '}' );

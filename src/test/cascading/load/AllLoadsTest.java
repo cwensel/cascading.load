@@ -178,7 +178,8 @@ public class AllLoadsTest extends LoadTestCase
       "-W", output + "working",
       "-O", output + "output",
 
-      "-MXCF", "0",                 // Serial execution
+      "-MXCF", "1",                 // Serial execution
+      "-MXCS", "1",
 
       "-g",
       "-gf", "1",

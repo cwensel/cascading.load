@@ -117,9 +117,6 @@ public class Main
     if( options.isOuterJoin() )
       flows.add( new OnlyOuterJoin( options, getDefaultProperties() ).createFlow() );
 
-    if( options.getMaxConcurrentFlows() != -1 )
-      Cascade.setMaxConcurrentFlows( getDefaultProperties(), options.getMaxConcurrentFlows() );
-
     Cascade cascade = new CascadeConnector( getDefaultProperties() ).connect( flows.toArray( new Flow[ 0 ] ) );
 
     CascadeStats stats = cascade.getCascadeStats();
@@ -247,6 +244,12 @@ public class Main
       String[] split = property.split( "=" );
       properties.setProperty( split[ 0 ], split[ 1 ] );
       }
+
+    if( options.getMaxConcurrentFlows() != -1 )
+      Cascade.setMaxConcurrentFlows( properties, options.getMaxConcurrentFlows() );
+
+    if( options.getMaxConcurrentSteps() != -1 )
+      Flow.setMaxConcurrentSteps( properties, options.getMaxConcurrentSteps() );
 
     FlowConnector.setApplicationJarClass( properties, Main.class );
 
