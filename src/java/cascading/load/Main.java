@@ -24,6 +24,7 @@ import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
 import cascading.load.common.CascadeLoadPlatform;
 import cascading.flow.hadoop.HadoopFlowProcess;
+import cascading.flow.hadoop.HadoopFlow;
 import cascading.load.countsort.CountSort;
 import cascading.load.countsort.StaggeredSort;
 import cascading.load.countsort.FullTupleGroup;
@@ -256,13 +257,13 @@ public class Main
         String[] split = property.split( "=" );
         properties.setProperty( split[ 0 ], split[ 1 ] );
         }
+
+      if( options.getMaxConcurrentSteps() != -1 )
+        HadoopFlow.setMaxConcurrentSteps( properties, options.getMaxConcurrentSteps() );
       }
 
     if( options.getMaxConcurrentFlows() != -1 )
       Cascade.setMaxConcurrentFlows( properties, options.getMaxConcurrentFlows() );
-
-    if( options.getMaxConcurrentSteps() != -1 )
-      Flow.setMaxConcurrentSteps( properties, options.getMaxConcurrentSteps() );
 
     FlowConnector.setApplicationJarClass( properties, Main.class );
 

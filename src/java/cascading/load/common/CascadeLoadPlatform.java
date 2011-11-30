@@ -39,8 +39,6 @@ import cascading.flow.local.LocalFlowProcess;
 import cascading.flow.local.LocalFlowConnector;
 import cascading.scheme.local.LocalScheme;
 
-import org.apache.hadoop.mapred.JobConf;
-
 /**
  * Provides access to Cascading platform (local or hadoop) specific implementation objects.
  *
