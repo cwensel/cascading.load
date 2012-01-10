@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import cascading.stats.CascadeStats;
 import cascading.stats.CascadingStats;
 import cascading.stats.FlowStats;
-import cascading.stats.StepStats;
+import cascading.stats.FlowStepStats;
 
 /**
  *
@@ -49,9 +49,9 @@ public class StatsPrinter
     {
     printSummaryFor( writer, "Flow", flowStat, null, singlelineStats );
 
-    Collection<StepStats> stepStats = flowStat.getChildren();
+    Collection<FlowStepStats> stepStats = flowStat.getChildren();
 
-    for( StepStats stepStat : stepStats )
+    for( FlowStepStats stepStat : stepStats )
       {
       if( !singlelineStats )
         writer.println();
@@ -59,12 +59,12 @@ public class StatsPrinter
       }
     }
 
-  public static void printStepStats( PrintWriter writer, StepStats stepStat )
+  public static void printStepStats( PrintWriter writer, FlowStepStats stepStat )
     {
     printStepStats( writer, stepStat, null, false );
     }
 
-  public static void printStepStats( PrintWriter writer, StepStats stepStat, FlowStats flowStat, boolean singlelineStats )
+  public static void printStepStats( PrintWriter writer, FlowStepStats stepStat, FlowStats flowStat, boolean singlelineStats )
     {
     String overrideName =
       flowStat == null ? null : getStepStatsName( stepStat, flowStat.getName(), singlelineStats );
@@ -113,7 +113,7 @@ public class StatsPrinter
 
   private static final Pattern stepStatSeqNumPatt = Pattern.compile( "^(\\(\\d+/\\d+\\)) " );
 
-  private static String getStepStatsName( StepStats stepStat, String parent, boolean uniqueName )
+  private static String getStepStatsName( FlowStepStats stepStat, String parent, boolean uniqueName )
     {
     String name = stepStat.getName();
     if( !uniqueName )
