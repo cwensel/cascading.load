@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011 Concurrent, Inc. All Rights Reserved.
+ * Copyright (c) 2007-2012 Concurrent, Inc. All Rights Reserved.
  *
  * Project and contact information: http://www.concurrentinc.com/
  */
@@ -22,10 +22,10 @@ import cascading.pipe.Each;
 import cascading.pipe.Every;
 import cascading.pipe.GroupBy;
 import cascading.pipe.Pipe;
-import cascading.pipe.cogroup.InnerJoin;
-import cascading.pipe.cogroup.LeftJoin;
-import cascading.pipe.cogroup.OuterJoin;
-import cascading.pipe.cogroup.RightJoin;
+import cascading.pipe.joiner.InnerJoin;
+import cascading.pipe.joiner.LeftJoin;
+import cascading.pipe.joiner.OuterJoin;
+import cascading.pipe.joiner.RightJoin;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;

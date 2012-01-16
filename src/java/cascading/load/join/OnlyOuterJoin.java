@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Concurrent, Inc. All Rights Reserved.
+ * Copyright (c) 2007-2012 Concurrent, Inc. All Rights Reserved.
  *
  * Project and contact information: http://www.concurrentinc.com/
  */
@@ -19,8 +19,8 @@ import cascading.operation.regex.RegexSplitter;
 import cascading.pipe.CoGroup;
 import cascading.pipe.Each;
 import cascading.pipe.Pipe;
-import cascading.pipe.cogroup.OuterJoin;
 import cascading.pipe.assembly.Unique;
+import cascading.pipe.joiner.OuterJoin;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;

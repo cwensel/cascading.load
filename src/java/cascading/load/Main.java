@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2007-2011 Concurrent, Inc. All Rights Reserved.
+ * Copyright (c) 2007-2012 Concurrent, Inc. All Rights Reserved.
  *
  * Project and contact information: http://www.concurrentinc.com/
  */
 
 package cascading.load;
 
-import java.io.File;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,27 +22,27 @@ import cascading.cascade.Cascade;
 import cascading.cascade.CascadeConnector;
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
-import cascading.load.common.CascadeLoadPlatform;
-import cascading.flow.hadoop.HadoopFlowProcess;
 import cascading.flow.hadoop.HadoopFlow;
+import cascading.load.common.CascadeLoadPlatform;
 import cascading.load.countsort.CountSort;
-import cascading.load.countsort.StaggeredSort;
 import cascading.load.countsort.FullTupleGroup;
+import cascading.load.countsort.StaggeredSort;
 import cascading.load.generate.GenerateData;
 import cascading.load.join.MultiJoin;
-import cascading.load.join.OnlyLeftJoin;
-import cascading.load.join.OnlyRightJoin;
-import cascading.load.join.OnlyOuterJoin;
 import cascading.load.join.OnlyInnerJoin;
-import cascading.load.pipeline.Pipeline;
-import cascading.load.pipeline.ChainedFunction;
+import cascading.load.join.OnlyLeftJoin;
+import cascading.load.join.OnlyOuterJoin;
+import cascading.load.join.OnlyRightJoin;
 import cascading.load.pipeline.ChainedAggregate;
+import cascading.load.pipeline.ChainedFunction;
+import cascading.load.pipeline.Pipeline;
 import cascading.load.util.StatsPrinter;
 import cascading.load.util.Util;
 import cascading.operation.DebugLevel;
 import cascading.stats.CascadeStats;
-import cascading.tap.Tap;
 import cascading.tap.SinkMode;
+import cascading.tap.Tap;
+import cascading.tuple.SpillableTupleList;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntryCollector;
 import org.apache.hadoop.fs.FileSystem;
@@ -219,7 +219,7 @@ public class Main
 
     if( !options.isLocalMode() )
       {
-      properties.setProperty( HadoopFlowProcess.SPILL_THRESHOLD, Integer.toString( options.getTupleSpillThreshold() ) );
+      properties.setProperty( SpillableTupleList.SPILL_THRESHOLD, Integer.toString( options.getTupleSpillThreshold() ) );
 
 //    properties.setProperty( "mapred.output.compress", "true" );
       properties.setProperty( "mapred.output.compression.codec", "org.apache.hadoop.io.compress.GzipCodec" );
