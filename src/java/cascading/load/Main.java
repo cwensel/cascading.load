@@ -48,6 +48,7 @@ import cascading.tuple.TupleEntryCollector;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -208,9 +209,17 @@ public class Main
     Properties properties = new Properties();
 
     if( options.isDebugLogging() )
+      {
+      Logger.getLogger( "cascading" ).setLevel( Level.DEBUG );
+      Logger.getLogger( "load" ).setLevel( Level.DEBUG );
       properties.put( "log4j.logger", "cascading=DEBUG,load=DEBUG" );
+      }
     else
+      {
+      Logger.getLogger( "cascading" ).setLevel( Level.INFO );
+      Logger.getLogger( "load" ).setLevel( Level.INFO );
       properties.put( "log4j.logger", "cascading=INFO,load=INFO" );
+      }
 
     if( options.isDebugLogging() )
       FlowConnector.setDebugLevel( properties, DebugLevel.VERBOSE );
