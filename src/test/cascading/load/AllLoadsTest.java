@@ -15,16 +15,10 @@ import cascading.load.countsort.CountSort;
 import cascading.load.generate.GenerateData;
 import cascading.load.join.MultiJoin;
 import cascading.load.pipeline.Pipeline;
-import cascading.test.HadoopPlatform;
-import cascading.test.LocalPlatform;
-import cascading.test.PlatformRunner;
-import org.junit.Test;
 
 /**
  *
  */
-//@PlatformRunner.Platform({LocalPlatform.class, HadoopPlatform.class})
-@PlatformRunner.Platform({HadoopPlatform.class})
 public class AllLoadsTest extends LoadTestCase
   {
   String output = "build/test/output/load/";
@@ -34,7 +28,6 @@ public class AllLoadsTest extends LoadTestCase
     super();
     }
 
-  @Test
   public void testAllLoads() throws Exception
     {
     String output = this.output + "api/";
@@ -87,7 +80,6 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 2, new File( pipeline.getOutputPaths()[ 0 ] ).list().length );
     }
 
-  @Test
   public void testMain() throws Exception
     {
     String output = this.output + "main/";
@@ -114,7 +106,6 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 6, new File( output + "output" ).list().length );
     }
 
-  @Test
   public void testCleanWorkFiles() throws Exception
     {
     String output = this.output + "maincwf/";
@@ -143,7 +134,6 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 1, new File( output ).list().length );
     }
 
-  @Test
   public void testSingleLineStatus() throws Exception
     {
     String output = this.output + "mainsls/";
@@ -178,7 +168,6 @@ public class AllLoadsTest extends LoadTestCase
     assertEquals( 15, lineNo );
     }
 
-  @Test
   public void testAllDiscreteFlows() throws Exception
     {
     String output = this.output + "mainadf/";
@@ -189,8 +178,7 @@ public class AllLoadsTest extends LoadTestCase
       "-W", output + "working",
       "-O", output + "output",
 
-      "-MXCF", "1",                 // Serial execution
-      "-MXCS", "1",
+      "-MXCF", "0",                 // Serial execution
 
       "-g",
       "-gf", "1",
@@ -210,68 +198,6 @@ public class AllLoadsTest extends LoadTestCase
     assertTrue( new Main( args ).execute() );
 
     assertEquals( 8, new File( output + "output" ).list().length );
-    }
-
-  @Test
-  public void testLocalMode() throws Exception
-    {
-    String output = this.output + "mainlm/";
-
-    String[] args = new String[]{
-      "-S", output + "status",
-      "-I", output + "input",
-      "-W", output + "working",
-      "-O", output + "output",
-
-      "-LM",                        // Local mode
-
-      "-g",
-      //"-gf", "1",                 // Local mode only has single file support
-      "-gs", "1",
-
-      "-ALL",                       // Original loads
-
-      //TODO own test
-      "-gwm", "0",                  // Normal distribution
-      "-gws", "0.2",
-
-      "-SLS"
-    };
-
-    assertTrue( new Main( args ).execute() );
-
-    assertEquals( 6, new File( output + "output" ).list().length );
-    }
-
-  @Test
-  public void testLocalModeCleanWorkFiles() throws Exception
-    {
-    String output = this.output + "mainlmcwf/";
-
-    String[] args = new String[]{
-      "-S", output + "status",
-      "-I", output + "input",
-      "-W", output + "working",
-      "-O", output + "output",
-
-      "-LM",                        // Local mode
-
-      "-g",
-      //"-gf", "1",                 // Local mode only has single file support
-      "-gs", "1",
-
-      "-ALL",                       // Original loads
-
-      //TODO own test
-      "-gwm", "0",                  // Normal distribution
-      "-gws", "0.2",
-
-      "-CWF"
-    };
-
-    assertTrue( new Main( args ).execute() );
-
-    assertEquals( 1, new File( output ).list().length );
     }
 
   }
